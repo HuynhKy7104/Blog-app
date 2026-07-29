@@ -1,0 +1,51 @@
+{
+  "name": "blog-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "packageManager": "npm@11.18.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "turbo": "^2.10.4"
+  },
+  "overrides": {
+    "postcss": "^8.5.10",
+    "multer": "^2.2.0",
+    "@hono/node-server": "^2.0.12",
+    "uuid": "^11.1.1",
+    "ws": "^8.20.2",
+    "@apollo/server-plugin-landing-page-graphql-playground": {
+      "@apollo/server": "^5.5.1"
+    },
+    "brace-expansion": "^5.0.8",
+    "minimatch": {
+      "brace-expansion": "^5.0.8"
+    },
+    "find-my-way": "^9.7.0",
+    "valibot": "^1.4.2",
+    "sharp": "^0.35.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "allowScripts": {
+    "prisma@7.9.0": true,
+    "@prisma/engines@7.9.0": true,
+    "argon2@0.44.0": true,
+    "better-sqlite3@12.11.1": true,
+    "esbuild@0.28.1": true,
+    "@apollo/protobufjs@1.2.8": true,
+    "unrs-resolver@1.12.2": true
+  }
+}

@@ -1,0 +1,153 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayload {
+  accessToken: String!
+  avatar: String!
+  id: Float!
+  name: String!
+}
+
+type Comment {
+  author: User
+  authorId: Int!
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  post: Post
+  postId: Int!
+  updatedAt: DateTime!
+}
+
+input CreateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateLikeInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateTagInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateUserInput {
+  avatar: String
+  bio: String
+  email: String!
+  name: String!
+  password: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Like {
+  createdAt: DateTime!
+  id: Int!
+  post: Post
+  postId: Int!
+  user: User
+  userId: Int!
+}
+
+type Mutation {
+  createComment(createCommentInput: CreateCommentInput!): Comment!
+  createLike(createLikeInput: CreateLikeInput!): Like!
+  createTag(createTagInput: CreateTagInput!): Tag!
+  createUser(createUserInput: CreateUserInput!): User!
+  removeComment(id: Int!): Comment!
+  removeLike(id: Int!): Like!
+  removeTag(id: Int!): Tag!
+  signIn(signInInput: SignInInput!): AuthPayload!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
+  updateLike(updateLikeInput: UpdateLikeInput!): Like!
+  updateTag(updateTagInput: UpdateTagInput!): Tag!
+  updateUser(id: Int!, updateUserInput: UpdateUserInput!): User!
+}
+
+type Post {
+  author: User
+  authorId: Int!
+  comments: [Comment!]
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  likes: [Like!]
+  published: Boolean!
+  slug: String
+  tags: [Tag!]
+  thumbnail: String
+  title: String!
+  updatedAt: DateTime!
+}
+
+type Query {
+  comment(id: Int!): Comment!
+  like(id: Int!): Like!
+  posts: [Post!]!
+  tag(id: Int!): Tag!
+}
+
+"""Vai trò của người dùng"""
+enum Role {
+  ADMIN
+  USER
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}
+
+type Tag {
+  id: Int!
+  name: String!
+  posts: [Post!]
+}
+
+input UpdateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateLikeInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateTagInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateUserInput {
+  avatar: String
+  bio: String
+  email: String
+  name: String
+  password: String
+}
+
+type User {
+  avatar: String
+  bio: String
+  comments: [Comment!]
+  createdAt: DateTime!
+  email: String!
+  id: Int!
+  likes: [Like!]
+  name: String!
+  posts: [Post!]
+  role: Role!
+  updatedAt: DateTime!
+}
