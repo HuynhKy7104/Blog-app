@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
     qualities: [50, 75, 85, 100],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+    ],
   },
 };
 
