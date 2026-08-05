@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { DEFAULT_PAGE_SIZE } from '../../constants';
 
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return await this.prisma.post.findMany();
+  async findAll(skip: number = 0, take: number = DEFAULT_PAGE_SIZE) {
+    return await this.prisma.post.findMany({
+      skip,
+      take,
+    });
+  }
+
+  async count() {
+    return await this.prisma.post.count();
   }
 }

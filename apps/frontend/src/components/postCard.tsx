@@ -6,7 +6,7 @@ type Props = Partial<Post>;
 
 const PostCard = ({ title, slug, thumbnail, content, createdAt }: Props) => {
   return (
-    <div className="flex flex-col h-full bg-primary-950/40 backdrop-blur-sm border border-white/10 rounded-lg shadow-lg shadow-primary-950/20 overflow-hidden hover:border-primary-400 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-1 transition-all">
+    <div className="flex flex-col h-full bg-primary-950/70 backdrop-blur-sm border border-white/10 rounded-lg shadow-lg shadow-primary-950/20 overflow-hidden hover:border-primary-400 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-1 transition-all">
       <div className="relative w-full aspect-video">
         <Image
           src={thumbnail ?? "/no-image.png"}

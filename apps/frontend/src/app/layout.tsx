@@ -31,7 +31,7 @@ export default function RootLayout({
     >
       <body
         className="min-h-full flex flex-col"
-        suppressHydrationWarning
+        suppressHydrationWarning={true}
       >
         <NavbarContainer>
           <Navbar />
