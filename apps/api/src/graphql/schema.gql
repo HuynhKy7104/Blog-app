@@ -90,6 +90,7 @@ type Post {
 
 type Query {
   comment(id: Int!): Comment!
+  findPostById(id: Int!): Post!
   like(id: Int!): Like!
   postCount: Int!
   posts(skip: Float, take: Float): [Post!]!

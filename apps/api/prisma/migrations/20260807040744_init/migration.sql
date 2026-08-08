@@ -5,7 +5,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "bio" TEXT,
     "avatar" TEXT,
-    "password" TEXT,
+    "password" TEXT NOT NULL,
     "hashedRefreshToken" TEXT,
     "role" TEXT NOT NULL DEFAULT 'USER',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

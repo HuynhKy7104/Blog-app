@@ -16,4 +16,17 @@ export class PostService {
   async count() {
     return await this.prisma.post.count();
   }
+
+  async findPostById(id: number) {
+    return await this.prisma.post.findUnique({
+      where: {
+        id: id,
+      },
+
+      include: {
+        tags: true,
+        author: true,
+      },
+    });
+  }
 }

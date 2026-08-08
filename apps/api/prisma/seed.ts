@@ -3,6 +3,7 @@ import { PrismaClient } from '../src/generated/prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { fakerVI as faker } from '@faker-js/faker';
 import { hash } from 'argon2';
+import process from 'process';
 
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -35,7 +36,7 @@ async function main() {
     data: users,
   });
 
-  const posts = Array.from({ length: 40 }).map(() => ({
+  const posts = Array.from({ length: 400 }).map(() => ({
     title: faker.lorem.sentence(),
     slug: generateSlug(faker.lorem.sentence()),
     content: faker.lorem.paragraphs(3),
