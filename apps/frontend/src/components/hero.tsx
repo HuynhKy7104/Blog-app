@@ -4,7 +4,7 @@ import Hero from "../../public/hero.png";
 
 const hero = () => {
   return (
-    <div className="bg-linear-to-br from-primary-600 to-secondary-600 text-primary-50 pt-12">
+    <div className="bg-linear-to-br from-primary-600 to-secondary-600 text-primary-50 pt-24">
       <div className="container mx-auto flex flex-col md:flex-row items-center flex-wrap px-3">
         {/* left col */}
         <div
@@ -33,7 +33,7 @@ const hero = () => {
             alt="Minh họa trang chủ blog"
             width={566}
             height={566}
-            className="w-full md:w-3/4 h-auto z-30"
+            className="w-full md:w-3/4 h-auto z-1"
             sizes="(max-width: 768px) 100vw, 75vw"
             priority
             quality={85}

@@ -26,7 +26,7 @@ const Sidebar = ({ triggerIcon, triggerClassName, children }: Props) => {
         ref={ref}
 
         className={cn(
-          "w-60 absolute duration-300 top-0 z-10 transition-all bg-space text-primary-50 rounded-r-md min-h-screen",
+          "fixed w-[30vw] max-w-sm duration-300 top-0 z-50 transition-all bg-space text-primary-50 rounded-r-md min-h-screen shadow-2xl",
           {
             "-left-full": !show,
             "left-0": show,
