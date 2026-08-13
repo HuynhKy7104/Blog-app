@@ -70,10 +70,19 @@ export const GET_POST_COMMENTS = gql`
       content
       author {
         name
+        avatar
       }
       createdAt
     }
 
     postCommentCount(postId: $postId)
+  }
+`;
+
+export const CREATE_POST_COMMENT = gql`
+  mutation ($content: String!, $postId: Int!) {
+    createPostComment(content: $content, postId: $postId) {
+      id
+    }
   }
 `;

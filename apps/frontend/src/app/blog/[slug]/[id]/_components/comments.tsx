@@ -36,6 +36,8 @@ export default function CommentSection({ postId, isLoggedIn, currentUser }: Prop
   const totalCount = data?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
+  console.log("=== DỮ LIỆU BÌNH LUẬN ===", comments);
+
   if (isError) {
     return (
       <div className="text-red-500 py-8 text-center">

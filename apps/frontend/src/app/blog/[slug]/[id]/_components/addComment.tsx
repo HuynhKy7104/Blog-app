@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { createCommentAction } from "@/lib/actions/commentActions";
 
 type Props = {
   postId: number;
@@ -32,8 +33,7 @@ export default function AddComment({ postId, isLoggedIn, currentUser }: Props) {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (newContent: string) => {
-      // Bỏ comment dòng dưới khi đã gắn API Action
-      // return await createCommentAction({ postId, content: newContent });
+      return await createCommentAction({ postId, content: newContent });
     },
     onSuccess: () => {
       setContent("");
