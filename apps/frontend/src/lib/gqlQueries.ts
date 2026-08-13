@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
 export const GET_POSTS = gql`
-  query posts($skip: Float, $take: Float) {
+  query posts($skip: Float!, $take: Float!) {
     posts(skip: $skip, take: $take) {
       id
       title
@@ -38,5 +38,42 @@ export const GET_POST_BY_ID = gql`
         name
       }
     }
+  }
+`;
+
+export const CREATE_USER_MUTATION = gql`
+  mutation CreateUser($signUpInput: SignUpInput!) {
+    CreateUser(signUpInput: $signUpInput) {
+      id
+      name
+      email
+    }
+  }
+`;
+
+export const SIGN_IN = gql`
+  mutation SignIn($signInInput: SignInInput!) {
+    signIn(signInInput: $signInInput) {
+      id
+      name
+      avatar
+      accessToken
+      refreshToken
+    }
+  }
+`;
+
+export const GET_POST_COMMENTS = gql`
+  query getPostComments($postId: Int!, $take: Int, $skip: Int) {
+    getPostComments(postId: $postId, take: $take, skip: $skip) {
+      id
+      content
+      author {
+        name
+      }
+      createdAt
+    }
+
+    postCommentCount(postId: $postId)
   }
 `;

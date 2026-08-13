@@ -1,14 +1,23 @@
+import { getSession } from "@/lib/sessions";
 import Link from "next/link";
+import ProfileDropdown from "./ProfileDropdown";
 
 type Props = {};
 
-const navLinks = [
+const publicLinks = [
   { label: "Trang chủ", href: "/" },
   { label: "Giới thiệu", href: "/about" },
   { label: "Liên hệ", href: "/contact" },
 ];
 
-const Navbar = (props: Props) => {
+const authLinks = [
+  { label: "Đăng nhập ", href: "/auth/signIn" },
+  { label: "Đăng ký", href: "/auth/signUp" },
+];
+
+const Navbar = async (props: Props) => {
+  const session = await getSession();
+
   return (
     <div className="flex flex-col md:flex-row items-center w-full h-full pt-4 md:pt-0">
       <h1 className="text-base md:text-2xl font-bold p-2 text-center md:text-left mb-6 md:mb-0">
@@ -23,15 +32,31 @@ const Navbar = (props: Props) => {
         [&>a]:hover:bg-primary-600 [&>a]:hover:text-primary-50 [&>a]:text-center md:[&>a]:text-left
         [&>a]:text-sm md:[&>a]:text-base"
       >
-        {navLinks.map((link) => (
+        {publicLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className="w-full md:w-auto border-b border-gray-100 md:border-none"
+            className="w-2/3 mx-auto text-center md:text-left md:w-auto border-b border-gray-100 md:border-none px-4 py-3 md:py-2"
           >
             {link.label}
           </Link>
         ))}
+
+        {!session?.user ? (
+          authLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="w-2/3 mx-auto text-center md:text-left md:w-auto border-b border-gray-100 md:border-none px-4 py-3 md:py-2"
+            >
+              {link.label}
+            </Link>
+          ))
+        ) : (
+          <div className="w-full flex justify-center mt-6 md:w-auto md:block md:mt-0">
+            <ProfileDropdown user={session.user} />
+          </div>
+        )}
       </div>
     </div>
   );

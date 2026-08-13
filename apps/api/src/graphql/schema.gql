@@ -2,11 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type AuthPayload {
-  accessToken: String!
-  avatar: String!
+type Auth {
+  email: String!
   id: Float!
   name: String!
+}
+
+type AuthPayload {
+  accessToken: String!
+  avatar: String
+  id: Float!
+  name: String!
+  refreshToken: String!
 }
 
 type Comment {
@@ -18,11 +25,6 @@ type Comment {
   post: Post
   postId: Int!
   updatedAt: DateTime!
-}
-
-input CreateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
 }
 
 input CreateLikeInput {
@@ -58,15 +60,14 @@ type Like {
 }
 
 type Mutation {
-  createComment(createCommentInput: CreateCommentInput!): Comment!
+  CreateUser(signUpInput: SignUpInput!): Auth!
   createLike(createLikeInput: CreateLikeInput!): Like!
+  createPostComment(content: String!, postId: Int!): Comment!
   createTag(createTagInput: CreateTagInput!): Tag!
   createUser(createUserInput: CreateUserInput!): User!
-  removeComment(id: Int!): Comment!
   removeLike(id: Int!): Like!
   removeTag(id: Int!): Tag!
   signIn(signInInput: SignInInput!): AuthPayload!
-  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
   updateLike(updateLikeInput: UpdateLikeInput!): Like!
   updateTag(updateTagInput: UpdateTagInput!): Tag!
   updateUser(id: Int!, updateUserInput: UpdateUserInput!): User!
@@ -89,9 +90,10 @@ type Post {
 }
 
 type Query {
-  comment(id: Int!): Comment!
   findPostById(id: Int!): Post!
+  getPostComments(postId: Int!, skip: Int = 0, take: Int = 12): [Comment!]!
   like(id: Int!): Like!
+  postCommentCount(postId: Int!): Int!
   postCount: Int!
   posts(skip: Float, take: Float): [Post!]!
   tag(id: Int!): Tag!
@@ -108,16 +110,16 @@ input SignInInput {
   password: String!
 }
 
+input SignUpInput {
+  email: String!
+  name: String!
+  password: String!
+}
+
 type Tag {
   id: Int!
   name: String!
   posts: [Post!]
-}
-
-input UpdateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
 
 input UpdateLikeInput {

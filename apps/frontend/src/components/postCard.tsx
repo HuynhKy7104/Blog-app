@@ -4,7 +4,7 @@ import Link from "next/link";
 
 type Props = Partial<Post>;
 
-const PostCard = ({ title, slug, thumbnail, content, createdAt }: Props) => {
+const PostCard = ({ title, slug, thumbnail, content, createdAt, id }: Props) => {
   return (
     <div className="flex flex-col h-full bg-primary-950/70 backdrop-blur-sm border border-white/10 rounded-lg shadow-lg shadow-primary-950/20 overflow-hidden hover:border-primary-400 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-1 transition-all">
       <div className="relative w-full aspect-video">
@@ -30,7 +30,7 @@ const PostCard = ({ title, slug, thumbnail, content, createdAt }: Props) => {
           )}
           {slug && (
             <Link
-              href={`/blog/${slug}`}
+              href={`/blog/${slug}/${id}`}
               className="text-xs font-semibold text-tertiary-400 hover:text-tertiary-300 transition-colors"
             >
               Đọc thêm →

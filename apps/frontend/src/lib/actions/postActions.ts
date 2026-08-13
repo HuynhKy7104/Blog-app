@@ -15,11 +15,11 @@ export const fetchPosts = async ({
 }) => {
   const { skip, take } = transformTakeSkip({ page, pageSize });
 
-  const data = await fetchGraphQL(print(GET_POSTS), { skip, take });
-  return { posts: data.posts as Post[], totalPosts: data.postCount };
+  const result = await fetchGraphQL(print(GET_POSTS), { skip, take });
+  return { posts: result.data.posts as Post[], totalPosts: result.data.postCount };
 };
 
 export const fetchPostById = async (id: number) => {
-  const data = await fetchGraphQL(print(GET_POST_BY_ID), { id });
-  return data.findPostById;
+  const result = await fetchGraphQL(print(GET_POST_BY_ID), { id });
+  return result.data.findPostById as Post;
 };

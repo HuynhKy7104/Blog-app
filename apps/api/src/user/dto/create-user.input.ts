@@ -11,7 +11,7 @@ export class CreateUserInput {
   @Field()
   @IsString()
   @MinLength(6)
-  password!: string;
+  password?: string;
 
   @Field()
   @IsEmail()

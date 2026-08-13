@@ -8,9 +8,12 @@ export class AuthPayload {
   @Field()
   name!: string;
 
-  @Field()
+  @Field({ nullable: true })
   avatar!: string;
 
   @Field()
   accessToken!: string;
+
+  @Field()
+  refreshToken!: string;
 }

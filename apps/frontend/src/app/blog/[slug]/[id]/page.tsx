@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { fetchPostById } from "@/lib/actions/postActions";
 import DOMPurify from "isomorphic-dompurify";
+import CommentSection from "./_components/comments";
+import { getSession } from "@/lib/sessions";
 
 type PostPageProps = {
   params: Promise<{
@@ -10,10 +12,19 @@ type PostPageProps = {
 };
 
 export default async function PostDetailPage({ params }: PostPageProps) {
+  const session = await getSession();
+
+  const isLoggedIn = !!session;
+  const currentUser = session
+    ? {
+        name: session.user.name,
+        avatar: session.user.avatar,
+      }
+    : undefined;
+
   const resolvedParams = await params;
 
   const postId = parseInt(resolvedParams.id, 10);
-
   const post = await fetchPostById(postId);
 
   if (!post) {
@@ -26,8 +37,6 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
   return (
     <main className="relative min-h-screen">
-      <div className="absolute top-0 left-0 w-full h-20 bg-linear-to-br from-primary-600 to-secondary-600" />
-
       <article className="relative max-w-3xl mx-auto pt-32 pb-12 px-4 sm:px-6">
         <header className="mb-10">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-primary-950 leading-tight mb-6">
@@ -91,6 +100,12 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             ))}
           </div>
         )}
+
+        <CommentSection
+          postId={postId}
+          isLoggedIn={isLoggedIn}
+          currentUser={currentUser}
+        />
       </article>
     </main>
   );
