@@ -62,7 +62,6 @@ type Mutation {
   likePost(postId: Int!): Boolean!
   removeTag(id: Int!): Tag!
   signIn(signInInput: SignInInput!): AuthPayload!
-  unlikePost(postId: Int!): Boolean!
   updateTag(updateTagInput: UpdateTagInput!): Tag!
   updateUser(id: Int!, updateUserInput: UpdateUserInput!): User!
 }

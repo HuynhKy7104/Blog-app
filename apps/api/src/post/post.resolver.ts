@@ -74,13 +74,4 @@ export class PostResolver {
   ) {
     return await this.likeService.likePost(user.id, postId);
   }
-
-  @Mutation(() => Boolean)
-  @UseGuards(JwtAuthGuard)
-  async unlikePost(
-    @Args('postId', { type: () => Int }) postId: number,
-    @CurrentUser() user: AuthUser,
-  ) {
-    return await this.likeService.unlikePost(user.id, postId);
-  }
 }

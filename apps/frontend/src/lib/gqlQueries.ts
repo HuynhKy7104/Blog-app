@@ -26,6 +26,8 @@ export const GET_POST_BY_ID = gql`
       published
       createdAt
       updatedAt
+      likeCount
+      isLiked
 
       author {
         id
@@ -84,5 +86,11 @@ export const CREATE_POST_COMMENT = gql`
     createPostComment(content: $content, postId: $postId) {
       id
     }
+  }
+`;
+
+export const LIKE_POST_MUTATION = gql`
+  mutation LikePost($postId: Int!) {
+    likePost(postId: $postId)
   }
 `;

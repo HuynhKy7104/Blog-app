@@ -3,6 +3,7 @@ import { fetchPostById } from "@/lib/actions/postActions";
 import DOMPurify from "isomorphic-dompurify";
 import CommentSection from "./_components/comments";
 import { getSession } from "@/lib/sessions";
+import Likes from "./_components/likes";
 
 type PostPageProps = {
   params: Promise<{
@@ -100,6 +101,13 @@ export default async function PostDetailPage({ params }: PostPageProps) {
             ))}
           </div>
         )}
+
+        <Likes
+          postId={post.id}
+          initialLikeCount={post.likeCount}
+          initialIsLiked={post.isLiked}
+          isLoggedIn={isLoggedIn}
+        />
 
         <CommentSection
           postId={postId}

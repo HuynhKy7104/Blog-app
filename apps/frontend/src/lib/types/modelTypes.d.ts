@@ -10,6 +10,8 @@ export type Post = {
   tags?: Tag[];
   createdAt: Date;
   updatedAt: Date;
+  likeCount: number;
+  isLiked: boolean;
   _count: {
     likes: number;
     comments: number;
