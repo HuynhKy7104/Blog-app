@@ -142,8 +142,8 @@ export const signUpAction = async (
   redirect(`/auth/signIn?callbackUrl=${encodedCallback}`);
 };
 
-export async function logoutAction() {
-  await deleteSession();
+export async function logoutAction(callbackUrl: string = "/") {
+  await deleteSession(callbackUrl);
 }
 
 export async function setupGoogleSessionAction(payload: any) {

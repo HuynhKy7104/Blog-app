@@ -52,7 +52,7 @@ export async function getSession() {
   }
 }
 
-export async function deleteSession() {
+export async function deleteSession(callbackUrl: string = "/") {
   await (await cookies()).delete("session");
-  redirect("/");
+  redirect(callbackUrl);
 }

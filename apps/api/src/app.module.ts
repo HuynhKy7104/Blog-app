@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -13,19 +13,17 @@ import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { OptionalAuthMiddleware } from './auth/middleware/optional-auth.middleware';
 
 @Module({
   imports: [
     PrismaModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'), // code-first, tự sinh schema
+      autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'),
       sortSchema: true,
-      playground: false, // tắt playground cũ (gói dính lỗ hổng)
-      plugins: [
-        ApolloServerPluginLandingPageLocalDefault(), // landing page thay thế, chỉ bật ở local
-      ],
-      // debug/introspection nên tắt ở production
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
       debug: process.env.NODE_ENV !== 'production',
       introspection: process.env.NODE_ENV !== 'production',
     }),
@@ -43,4 +41,8 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(OptionalAuthMiddleware).forRoutes('*');
+  }
+}

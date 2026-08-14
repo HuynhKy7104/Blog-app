@@ -12,6 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTransition } from "react";
 import { logoutAction } from "@/lib/actions/authActions";
+import { usePathname } from "next/navigation";
 
 const menuItems = [
   { label: "📝 Tạo bài viết mới", href: "/posts/create" },
@@ -25,11 +26,13 @@ type Props = {
 export default function ProfileDropdown({ user }: Props) {
   const initial = user.name ? user.name.charAt(0).toUpperCase() : "U";
 
+  const pathname = usePathname();
+
   const [isPending, startTransition] = useTransition();
 
   const handleLogout = () => {
     startTransition(async () => {
-      await logoutAction();
+      await logoutAction(pathname);
     });
   };
 

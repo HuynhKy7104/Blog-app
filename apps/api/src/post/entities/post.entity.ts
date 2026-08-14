@@ -45,4 +45,14 @@ export class Post {
 
   @Field()
   updatedAt!: Date;
+
+  // ==========================================
+  // THÊM 2 TRƯỜNG ẢO CHO TÍNH NĂNG LIKE TẠI ĐÂY
+  // ==========================================
+
+  @Field(() => Int, { defaultValue: 0 })
+  likeCount?: number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  isLiked?: boolean;
 }

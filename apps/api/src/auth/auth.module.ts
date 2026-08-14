@@ -31,5 +31,6 @@ import { AuthController } from './auth.controller';
     JwtStrategy,
     GoogleStrategy,
   ],
+  exports: [JwtModule],
 })
 export class AuthModule {}

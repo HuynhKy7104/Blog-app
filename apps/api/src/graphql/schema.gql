@@ -27,11 +27,6 @@ type Comment {
   updatedAt: DateTime!
 }
 
-input CreateLikeInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 input CreateTagInput {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -61,14 +56,13 @@ type Like {
 
 type Mutation {
   CreateUser(signUpInput: SignUpInput!): Auth!
-  createLike(createLikeInput: CreateLikeInput!): Like!
   createPostComment(content: String!, postId: Int!): Comment!
   createTag(createTagInput: CreateTagInput!): Tag!
   createUser(createUserInput: CreateUserInput!): User!
-  removeLike(id: Int!): Like!
+  likePost(postId: Int!): Boolean!
   removeTag(id: Int!): Tag!
   signIn(signInInput: SignInInput!): AuthPayload!
-  updateLike(updateLikeInput: UpdateLikeInput!): Like!
+  unlikePost(postId: Int!): Boolean!
   updateTag(updateTagInput: UpdateTagInput!): Tag!
   updateUser(id: Int!, updateUserInput: UpdateUserInput!): User!
 }
@@ -80,6 +74,8 @@ type Post {
   content: String!
   createdAt: DateTime!
   id: Int!
+  isLiked: Boolean!
+  likeCount: Int!
   likes: [Like!]
   published: Boolean!
   slug: String
@@ -92,7 +88,6 @@ type Post {
 type Query {
   findPostById(id: Int!): Post!
   getPostComments(postId: Int!, skip: Int = 0, take: Int = 12): [Comment!]!
-  like(id: Int!): Like!
   postCommentCount(postId: Int!): Int!
   postCount: Int!
   posts(skip: Float, take: Float): [Post!]!
@@ -120,12 +115,6 @@ type Tag {
   id: Int!
   name: String!
   posts: [Post!]
-}
-
-input UpdateLikeInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
 
 input UpdateTagInput {
