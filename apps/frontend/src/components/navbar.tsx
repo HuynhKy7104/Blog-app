@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/sessions";
 import Link from "next/link";
 import ProfileDropdown from "./ProfileDropdown";
+import AuthButtons from "./AuthButtons";
 
 type Props = {};
 
@@ -43,15 +44,7 @@ const Navbar = async (props: Props) => {
         ))}
 
         {!session?.user ? (
-          authLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="w-2/3 mx-auto text-center md:text-left md:w-auto border-b border-gray-100 md:border-none px-4 py-3 md:py-2"
-            >
-              {link.label}
-            </Link>
-          ))
+          <AuthButtons />
         ) : (
           <div className="w-full flex justify-center mt-6 md:w-auto md:block md:mt-0">
             <ProfileDropdown user={session.user} />

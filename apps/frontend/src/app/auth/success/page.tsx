@@ -29,7 +29,11 @@ export default function AuthSuccessPage() {
 
         await setupGoogleSessionAction(sessionPayload);
 
-        router.push("/");
+        const redirectURL = sessionStorage.getItem("oauth_redirect") || "/";
+
+        sessionStorage.removeItem("oauth_redirect");
+
+        router.push(redirectURL);
         router.refresh();
       } else {
         router.push("/auth/signin");

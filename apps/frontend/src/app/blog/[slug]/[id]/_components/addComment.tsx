@@ -31,6 +31,8 @@ export default function AddComment({ postId, isLoggedIn, currentUser }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const encodedCallback = encodeURIComponent(pathname);
+
   const { mutate, isPending } = useMutation({
     mutationFn: async (newContent: string) => {
       return await createCommentAction({ postId, content: newContent });
@@ -47,10 +49,7 @@ export default function AddComment({ postId, isLoggedIn, currentUser }: Props) {
 
   const handleOpenChange = (open: boolean) => {
     if (!isLoggedIn && open) {
-      alert("Vui lòng đăng nhập để bình luận!");
-
-      router.push(getLoginUrl(pathname));
-
+      router.push(`/auth/signIn?callbackUrl=${encodedCallback}`);
       return;
     }
 

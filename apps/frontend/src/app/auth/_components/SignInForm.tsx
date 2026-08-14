@@ -22,6 +22,9 @@ export default function SignInForm() {
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const handleGoogleLogin = () => {
+    if (callbackUrl) {
+      sessionStorage.setItem("oauth_redirect", callbackUrl);
+    }
     window.location.href = `${BACKEND_URL}/auth/google`;
   };
 

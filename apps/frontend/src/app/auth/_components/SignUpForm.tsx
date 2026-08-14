@@ -6,6 +6,7 @@ import SubmitButton from "./SubmitButton";
 import { signUpAction } from "@/lib/actions/authActions";
 import { useActionState } from "react";
 import { FormState } from "@/lib/types/formState";
+import { useSearchParams } from "next/navigation";
 
 const initialState: FormState = {
   success: false,
@@ -16,12 +17,21 @@ const initialState: FormState = {
 export default function SignUpForm() {
   const [state, formAction] = useActionState(signUpAction, initialState);
 
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+
   return (
     <form
       action={formAction}
       className="space-y-4"
       noValidate
     >
+      <input
+        type="hidden"
+        name="callbackUrl"
+        value={callbackUrl}
+      />
+
       {state?.message && (
         <div
           className={`p-3 rounded-md text-sm font-medium ${state.success ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}

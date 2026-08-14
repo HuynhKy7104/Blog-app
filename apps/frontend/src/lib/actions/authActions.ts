@@ -92,6 +92,8 @@ export const signUpAction = async (
   const password = formData.get("password")?.toString() || "";
   const confirmPassword = formData.get("confirmPassword")?.toString() || "";
 
+  const callbackUrl = formData.get("callbackUrl")?.toString() || "/";
+
   const validatedFields = SignUpSchema.safeParse({
     email,
     name,
@@ -120,7 +122,6 @@ export const signUpAction = async (
 
     if (result.errors && result.errors.length > 0) {
       const errorMessage = result.errors[0].message;
-
       return {
         success: false,
         message: "Đăng ký thất bại.",
@@ -129,17 +130,16 @@ export const signUpAction = async (
         },
       };
     }
-
-    return { success: true, message: "Đăng ký thành công!" };
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Đăng ký thất bại, vui lòng thử lại.",
+      message: "Lỗi hệ thống, vui lòng thử lại sau.",
+      errors: {},
     };
   }
+
+  const encodedCallback = encodeURIComponent(callbackUrl);
+  redirect(`/auth/signIn?callbackUrl=${encodedCallback}`);
 };
 
 export async function logoutAction() {
