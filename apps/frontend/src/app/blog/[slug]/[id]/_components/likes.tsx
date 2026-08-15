@@ -4,6 +4,7 @@ import { likePost } from "@/lib/actions/postActions";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface LikesProps {
   postId: number;
@@ -28,7 +29,18 @@ export default function Likes({
 
   const handleToggleLike = async () => {
     if (!isLoggedIn) {
-      router.push(`/auth/signIn?callbackUrl=${encodedCallback}`);
+      toast.error("Bạn cần đăng nhập để thả tim bài viết này!", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+
+      setTimeout(() => {
+        router.push(`/auth/signIn?callbackUrl=${encodedCallback}`);
+      }, 1500);
+
       return;
     }
 

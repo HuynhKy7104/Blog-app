@@ -8,62 +8,148 @@ import process from 'process';
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+const TOTAL_USERS = 20;
+const TOTAL_POSTS = 150;
+const MAX_COMMENTS_PER_POST = 15;
+const MAX_LIKES_PER_POST = 15;
+const PUBLISHED_RATIO = 0.8; // 80% post published, 20% draft
+const BATCH_SIZE = 20;
+
 function generateSlug(title: string): string {
   return title
-    .normalize('NFD') // tách dấu ra khỏi chữ cái
-    .replace(/[\u0300-\u036f]/g, '') // xóa dấu
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D') // xử lý riêng chữ "đ"
+    .replace(/Đ/g, 'D')
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '') // xóa ký tự đặc biệt
-    .replace(/\s+/g, '-') // thay khoảng trắng (kể cả nhiều dấu cách) bằng "-"
-    .replace(/-+/g, '-'); // gộp nhiều dấu "-" liên tiếp thành 1
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function chunk<T>(arr: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
 }
 
 async function main() {
+  console.time('Seed time');
+
+  // 1. Dọn dữ liệu cũ
+  await prisma.like.deleteMany();
+  await prisma.comment.deleteMany();
+  await prisma.$executeRawUnsafe(`DELETE FROM "_PostToTag"`);
+  await prisma.post.deleteMany();
+  await prisma.tag.deleteMany();
+  await prisma.user.deleteMany();
+
   const defaultPassword = await hash('123456');
 
-  const users = Array.from({ length: 10 }).map(() => ({
-    name: faker.person.fullName(),
-    email: faker.internet.email(),
-    bio: faker.lorem.sentence(),
-    avatar: faker.image.avatar(),
-    password: defaultPassword,
-  }));
-
+  // 2. Seed user — 1 admin + còn lại user thường
   await prisma.user.createMany({
-    data: users,
+    data: Array.from({ length: TOTAL_USERS }).map((_, i) => ({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      bio: faker.lorem.sentence(),
+      avatar: faker.image.avatar(),
+      password: defaultPassword,
+      role: i === 0 ? 'ADMIN' : 'USER',
+    })),
   });
 
-  const posts = Array.from({ length: 400 }).map(() => ({
-    title: faker.lorem.sentence(),
-    slug: generateSlug(faker.lorem.sentence()),
-    content: faker.lorem.paragraphs(3),
-    thumbnail: faker.image.url(),
-    authorId: faker.number.int({ min: 1, max: 10 }),
-    published: true,
-  }));
-
-  await Promise.all(
-    posts.map(async (post) => {
-      await prisma.post.create({
-        data: {
-          ...post,
-          comments: {
-            createMany: {
-              data: Array.from({ length: 20 }).map(() => ({
-                content: faker.lorem.sentence(),
-                authorId: faker.number.int({ min: 1, max: 10 }),
-              })),
-            },
-          },
-        },
-      });
-    }),
+  const allUserIds = (await prisma.user.findMany({ select: { id: true } })).map(
+    (u) => u.id,
   );
 
+  // 3. Seed tag
+  const tagNames = [
+    'Công nghệ',
+    'Du lịch',
+    'Ẩm thực',
+    'Thể thao',
+    'Giải trí',
+    'Giáo dục',
+    'Sức khoẻ',
+    'Kinh doanh',
+  ];
+
+  await prisma.tag.createMany({ data: tagNames.map((name) => ({ name })) });
+  const allTags = await prisma.tag.findMany({ select: { id: true } });
+
+  // 4. Seed post
+  const postInputs = Array.from({ length: TOTAL_POSTS }).map((_, i) => {
+    const title = faker.lorem.sentence();
+    return {
+      title,
+      slug: `${generateSlug(title)}-${i}`,
+      content: faker.lorem.paragraphs(3),
+      thumbnail: faker.image.url(),
+      authorId: faker.helpers.arrayElement(allUserIds),
+      published: faker.datatype.boolean({ probability: PUBLISHED_RATIO }),
+    };
+  });
+
+  await prisma.post.createMany({ data: postInputs });
+
+  const allPosts = await prisma.post.findMany({
+    select: { id: true },
+    orderBy: { id: 'asc' },
+  });
+
+  // 5. Connect tag + comment + like theo batch
+  const postBatches = chunk(allPosts, BATCH_SIZE);
+
+  for (const [index, batch] of postBatches.entries()) {
+    await prisma.$transaction(
+      batch.map(({ id: postId }) => {
+        const randomTags = faker.helpers.arrayElements(allTags, {
+          min: 1,
+          max: 3,
+        });
+
+        const commentCount = faker.number.int({
+          min: 0,
+          max: MAX_COMMENTS_PER_POST,
+        });
+
+        const likeUserIds = faker.helpers.arrayElements(allUserIds, {
+          min: 0,
+          max: Math.min(MAX_LIKES_PER_POST, allUserIds.length),
+        });
+
+        return prisma.post.update({
+          where: { id: postId },
+          data: {
+            tags: { connect: randomTags.map((tag) => ({ id: tag.id })) },
+            comments: {
+              createMany: {
+                data: Array.from({ length: commentCount }).map(() => ({
+                  content: faker.lorem.sentence(),
+                  authorId: faker.helpers.arrayElement(allUserIds),
+                })),
+              },
+            },
+            likes: {
+              createMany: {
+                data: likeUserIds.map((userId) => ({ userId })),
+              },
+            },
+          },
+        });
+      }),
+    );
+
+    console.log(
+      `Đã xử lý batch ${index + 1}/${postBatches.length} (${batch.length} post)`,
+    );
+  }
+
   console.log('Seeding Completed');
+  console.timeEnd('Seed time');
 }
 
 main()
