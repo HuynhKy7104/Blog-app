@@ -16,6 +16,7 @@ import { Request } from 'express';
 import { CurrentUser } from '../auth/guards/jwt-auth/current-user.decorator';
 import type { AuthUser } from '../auth/types/auth-user.type';
 import { LikeService } from '../like/like.service';
+import { UpdatePostInput } from './dto/update-post.input';
 
 interface GqlContext {
   req: Request;
@@ -73,5 +74,38 @@ export class PostResolver {
     @CurrentUser() user: AuthUser,
   ) {
     return await this.likeService.likePost(user.id, postId);
+  }
+
+  @Query(() => [Post])
+  @UseGuards(JwtAuthGuard)
+  async getUserPosts(@CurrentUser() user: AuthUser) {
+    return await this.postService.getUserPosts(user.id);
+  }
+
+  @Mutation(() => Post)
+  @UseGuards(JwtAuthGuard)
+  async updateUserPost(
+    @CurrentUser() user: AuthUser,
+    @Args('postId', { type: () => Int }) postId: number,
+    @Args('updateData')
+    updateData: UpdatePostInput,
+  ) {
+    return this.postService.updateUserPost({
+      postId,
+      userId: user.id,
+      updateData,
+    });
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(JwtAuthGuard)
+  async deleteUserPost(
+    @CurrentUser() user: AuthUser,
+    @Args('postId', { type: () => Int }) postId: number,
+  ) {
+    return this.postService.deleteUserPost({
+      postId,
+      userId: user.id,
+    });
   }
 }
