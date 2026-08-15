@@ -1,16 +1,6 @@
-import { IsOptional, IsString } from 'class-validator';
+// src/post/dto/update-post.input.ts
+import { InputType, PartialType } from '@nestjs/graphql';
 import { CreatePostInput } from './create-post.input';
-import { InputType, Field, PartialType } from '@nestjs/graphql';
 
 @InputType()
-export class UpdatePostInput extends PartialType(CreatePostInput) {
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  title?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  content?: string;
-}
+export class UpdatePostInput extends PartialType(CreatePostInput) {}

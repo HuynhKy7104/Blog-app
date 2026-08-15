@@ -1,4 +1,4 @@
-// src/posts/dto/get-user-posts.input.ts
+// src/post/dto/get-user-posts.dto.ts
 import { InputType, Field, Int } from '@nestjs/graphql';
 import {
   IsOptional,
@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsEnum,
   IsInt,
+  IsArray,
   Min,
 } from 'class-validator';
 import { PostSortBy } from './post-sort-by.enum';
@@ -27,6 +28,12 @@ export class GetUserPostsInput {
   @IsOptional()
   @IsEnum(PostSortBy)
   sortBy?: PostSortBy;
+
+  @Field(() => [Int], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  tagIds?: number[];
 
   @Field(() => Int, { nullable: true, defaultValue: 0 })
   @IsOptional()

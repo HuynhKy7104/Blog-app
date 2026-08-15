@@ -50,6 +50,7 @@ input GetUserPostsInput {
   search: String
   skip: Int = 0
   sortBy: PostSortBy
+  tagIds: [Int!]
   take: Int = 12
 }
 
@@ -135,9 +136,10 @@ type Tag {
 
 input UpdatePostInput {
   content: String
-
-  """Example field (placeholder)"""
-  exampleField: Int
+  published: Boolean = false
+  slug: String
+  tagIds: [Int!]
+  thumbnail: String
   title: String
 }
 

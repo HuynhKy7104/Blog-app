@@ -60,6 +60,7 @@ export class PostService {
       search,
       isPublished,
       sortBy,
+      tagIds,
       skip = 0,
       take = DEFAULT_PAGE_SIZE,
     } = input;
@@ -76,8 +77,12 @@ export class PostService {
         authorId: userId,
         ...(search && { title: { contains: search } }),
         ...(isPublished !== undefined && { published: isPublished }),
+        ...(tagIds &&
+          tagIds.length > 0 && {
+            tags: { some: { id: { in: tagIds } } },
+          }),
       },
-      include: { author: true },
+      include: { author: true, tags: true },
       orderBy: orderByClause,
     });
   }
@@ -91,11 +96,7 @@ export class PostService {
     postId: number;
     updateData: UpdatePostInput;
   }) {
-    const post = await this.prisma.post.findUnique({
-      where: {
-        id: postId,
-      },
-    });
+    const post = await this.prisma.post.findUnique({ where: { id: postId } });
 
     if (!post) {
       throw new NotFoundException('Không tìm thấy bài viết này!');
@@ -107,12 +108,16 @@ export class PostService {
       );
     }
 
-    return await this.prisma.post.update({
-      where: {
-        id: postId,
-      },
+    const { tagIds, ...rest } = updateData;
 
-      data: updateData,
+    return this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        ...rest,
+        ...(tagIds !== undefined && {
+          tags: { set: tagIds.map((id) => ({ id })) },
+        }),
+      },
     });
   }
 
