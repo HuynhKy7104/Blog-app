@@ -2,7 +2,6 @@ import { PostService } from './post.service';
 import { Post } from './entities/post.entity';
 import {
   Args,
-  Context,
   Int,
   Mutation,
   Parent,
@@ -12,15 +11,11 @@ import {
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth/jwt-auth.guard';
-import { Request } from 'express';
 import { CurrentUser } from '../auth/guards/jwt-auth/current-user.decorator';
 import type { AuthUser } from '../auth/types/auth-user.type';
 import { LikeService } from '../like/like.service';
 import { UpdatePostInput } from './dto/update-post.input';
-
-interface GqlContext {
-  req: Request;
-}
+import { GetUserPostsInput } from './dto/get-user-posts.dto';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -29,16 +24,11 @@ export class PostResolver {
     private readonly likeService: LikeService,
   ) {}
 
-  // @UseGuards(JwtAuthGuard)
   @Query(() => [Post], { name: 'posts' })
   findAll(
-    @Context() context: GqlContext,
     @Args('skip', { nullable: true }) skip?: number,
     @Args('take', { nullable: true }) take?: number,
   ) {
-    // const user = context.req.user;
-    // console.log({ user });
-
     return this.postService.findAll(skip, take);
   }
 
@@ -78,8 +68,12 @@ export class PostResolver {
 
   @Query(() => [Post])
   @UseGuards(JwtAuthGuard)
-  async getUserPosts(@CurrentUser() user: AuthUser) {
-    return await this.postService.getUserPosts(user.id);
+  async getUserPosts(
+    @CurrentUser() user: AuthUser,
+    @Args('input', { nullable: true })
+    input: GetUserPostsInput = new GetUserPostsInput(),
+  ) {
+    return this.postService.getUserPosts(user.id, input);
   }
 
   @Mutation(() => Post)

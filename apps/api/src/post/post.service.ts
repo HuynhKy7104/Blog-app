@@ -6,6 +6,8 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { DEFAULT_PAGE_SIZE } from '../../constants';
 import { UpdatePostInput } from './dto/update-post.input';
+import { GetUserPostsInput } from './dto/get-user-posts.dto';
+import { PostSortBy } from './dto/post-sort-by.enum';
 
 @Injectable()
 export class PostService {
@@ -53,22 +55,31 @@ export class PostService {
     return !!likeRecord;
   }
 
-  async getUserPosts(userId: number) {
-    const posts = await this.prisma.post.findMany({
+  async getUserPosts(userId: number, input: GetUserPostsInput) {
+    const {
+      search,
+      isPublished,
+      sortBy,
+      skip = 0,
+      take = DEFAULT_PAGE_SIZE,
+    } = input;
+
+    const orderByClause: { createdAt: 'asc' | 'desc' } =
+      sortBy === PostSortBy.OLDEST
+        ? { createdAt: 'asc' }
+        : { createdAt: 'desc' };
+
+    return this.prisma.post.findMany({
+      skip,
+      take,
       where: {
         authorId: userId,
+        ...(search && { title: { contains: search } }),
+        ...(isPublished !== undefined && { published: isPublished }),
       },
-
-      include: {
-        author: true,
-      },
-
-      orderBy: {
-        createdAt: 'desc',
-      },
+      include: { author: true },
+      orderBy: orderByClause,
     });
-
-    return posts;
   }
 
   async updateUserPost({
