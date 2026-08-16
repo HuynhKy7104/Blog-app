@@ -70,21 +70,28 @@ export class PostService {
         ? { createdAt: 'asc' }
         : { createdAt: 'desc' };
 
-    return this.prisma.post.findMany({
-      skip,
-      take,
-      where: {
-        authorId: userId,
-        ...(search && { title: { contains: search } }),
-        ...(isPublished !== undefined && { published: isPublished }),
-        ...(tagIds &&
-          tagIds.length > 0 && {
-            tags: { some: { id: { in: tagIds } } },
-          }),
-      },
-      include: { author: true, tags: true },
-      orderBy: orderByClause,
-    });
+    const whereClause = {
+      authorId: userId,
+      ...(search && { title: { contains: search } }),
+      ...(isPublished !== undefined && { published: isPublished }),
+      ...(tagIds &&
+        tagIds.length > 0 && {
+          tags: { some: { id: { in: tagIds } } },
+        }),
+    };
+
+    const [posts, totalCount] = await Promise.all([
+      this.prisma.post.findMany({
+        skip,
+        take,
+        where: whereClause,
+        include: { author: true, tags: true },
+        orderBy: orderByClause,
+      }),
+      this.prisma.post.count({ where: whereClause }),
+    ]);
+
+    return { posts, totalCount };
   }
 
   async updateUserPost({

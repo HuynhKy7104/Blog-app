@@ -104,7 +104,7 @@ enum PostSortBy {
 type Query {
   findPostById(id: Int!): Post!
   getPostComments(postId: Int!, skip: Int = 0, take: Int = 12): [Comment!]!
-  getUserPosts(input: GetUserPostsInput): [Post!]!
+  getUserPosts(input: GetUserPostsInput): UserPostsResult!
   postCommentCount(postId: Int!): Int!
   postCount: Int!
   posts(skip: Float, take: Float): [Post!]!
@@ -169,4 +169,9 @@ type User {
   posts: [Post!]
   role: Role!
   updatedAt: DateTime!
+}
+
+type UserPostsResult {
+  posts: [Post!]!
+  totalCount: Int!
 }

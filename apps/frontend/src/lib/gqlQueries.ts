@@ -94,3 +94,35 @@ export const LIKE_POST_MUTATION = gql`
     likePost(postId: $postId)
   }
 `;
+
+export const GET_USER_POSTS = gql`
+  query GetUserPosts($input: GetUserPostsInput) {
+    getUserPosts(input: $input) {
+      posts {
+        id
+        title
+        thumbnail
+        published
+        createdAt
+        likeCount
+        content
+        updatedAt
+        # ...
+      }
+      totalCount
+    }
+  }
+`;
+
+export const UPDATE_POST_MUTATION = gql`
+  mutation UpdateUserPost($postId: Int!, $updateData: UpdatePostInput!) {
+    updateUserPost(postId: $postId, updateData: $updateData) {
+      id
+      title
+      content
+      thumbnail
+      published
+      updatedAt
+    }
+  }
+`;

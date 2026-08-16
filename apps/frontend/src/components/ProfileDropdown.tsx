@@ -16,7 +16,7 @@ import { usePathname } from "next/navigation";
 
 const menuItems = [
   { label: "📝 Tạo bài viết mới", href: "/posts/create" },
-  { label: "📚 Danh sách bài viết", href: "/posts/my-posts" },
+  { label: "📚 Danh sách bài viết", href: "/dashboard/posts" },
 ];
 
 type Props = {

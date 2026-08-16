@@ -4,6 +4,7 @@ import DOMPurify from "isomorphic-dompurify";
 import CommentSection from "./_components/comments";
 import { getSession } from "@/lib/sessions";
 import Likes from "./_components/likes";
+import { Tag } from "@/lib/types/modelTypes";
 
 type PostPageProps = {
   params: Promise<{
@@ -91,7 +92,7 @@ export default async function PostDetailPage({ params }: PostPageProps) {
         {post.tags && post.tags.length > 0 && (
           <div className="mt-12 pt-8 border-t border-gray-200 flex flex-wrap gap-2 items-center">
             <span className="text-gray-500 mr-2 font-medium">Chủ đề:</span>
-            {post.tags.map((tag: any) => (
+            {post.tags.map((tag: Tag) => (
               <span
                 key={tag.id}
                 className="px-3 py-1 bg-primary-50 text-primary-700 text-sm rounded-full border border-primary-100 font-medium"

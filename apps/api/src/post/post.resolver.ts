@@ -16,6 +16,7 @@ import type { AuthUser } from '../auth/types/auth-user.type';
 import { LikeService } from '../like/like.service';
 import { UpdatePostInput } from './dto/update-post.input';
 import { GetUserPostsInput } from './dto/get-user-posts.dto';
+import { UserPostsResult } from './entities/user-posts-result.entity';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -66,7 +67,7 @@ export class PostResolver {
     return await this.likeService.likePost(user.id, postId);
   }
 
-  @Query(() => [Post])
+  @Query(() => UserPostsResult)
   @UseGuards(JwtAuthGuard)
   async getUserPosts(
     @CurrentUser() user: AuthUser,
