@@ -8,6 +8,7 @@ import { DEFAULT_PAGE_SIZE } from '../../constants';
 import { UpdatePostInput } from './dto/update-post.input';
 import { GetUserPostsInput } from './dto/get-user-posts.dto';
 import { PostSortBy } from './dto/post-sort-by.enum';
+import { Prisma } from '../generated/prisma/client';
 
 @Injectable()
 export class PostService {
@@ -61,31 +62,78 @@ export class PostService {
       isPublished,
       sortBy,
       tagIds,
+      startDate,
+      endDate,
       skip = 0,
       take = DEFAULT_PAGE_SIZE,
     } = input;
 
-    const orderByClause: { updatedAt: 'asc' | 'desc' } =
-      sortBy === PostSortBy.OLDEST
-        ? { updatedAt: 'asc' }
-        : { updatedAt: 'desc' };
-
-    const whereClause = {
+    // 2. TẠO WHERE CLAUSE VỚI KIỂU DỮ LIỆU CHUẨN CỦA PRISMA VÀ CÚ PHÁP SPREAD
+    const whereClause: Prisma.PostWhereInput = {
       authorId: userId,
-      ...(search && { title: { contains: search } }),
+
+      // Nếu có search thì mới thêm khối OR vào object
+      ...(search && {
+        OR: [
+          { title: { contains: search } },
+          { content: { contains: search } },
+        ],
+      }),
+
+      // Nếu isPublished khác undefined thì mới thêm vào
       ...(isPublished !== undefined && { published: isPublished }),
+
+      // Nếu có tagIds thì mới thêm điều kiện lọc Tag
       ...(tagIds &&
         tagIds.length > 0 && {
           tags: { some: { id: { in: tagIds } } },
         }),
+
+      // Lọc theo khoảng thời gian
+      ...((startDate || endDate) && {
+        createdAt: {
+          ...(startDate && { gte: startDate }),
+          ...(endDate && { lte: endDate }),
+        },
+      }),
     };
 
+    // 3. TẠO ORDER BY CLAUSE VỚI KIỂU DỮ LIỆU CHUẨN
+    let orderByClause: Prisma.PostOrderByWithRelationInput;
+
+    switch (sortBy) {
+      case PostSortBy.OLDEST:
+        orderByClause = { createdAt: 'asc' };
+        break;
+      case PostSortBy.NEWEST:
+        orderByClause = { createdAt: 'desc' };
+        break;
+      case PostSortBy.RECENTLY_UPDATED:
+        orderByClause = { updatedAt: 'desc' };
+        break;
+      case PostSortBy.MOST_LIKES:
+        orderByClause = { likes: { _count: 'desc' } };
+        break;
+      case PostSortBy.MOST_COMMENTS:
+        orderByClause = { comments: { _count: 'desc' } };
+        break;
+      default:
+        orderByClause = { createdAt: 'desc' };
+    }
+
+    // 4. THỰC THI TRUY VẤN
     const [posts, totalCount] = await Promise.all([
       this.prisma.post.findMany({
         skip,
         take,
         where: whereClause,
-        include: { author: true, tags: true },
+        include: {
+          author: true,
+          tags: true,
+          _count: {
+            select: { likes: true, comments: true },
+          },
+        },
         orderBy: orderByClause,
       }),
       this.prisma.post.count({ where: whereClause }),

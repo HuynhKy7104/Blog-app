@@ -56,6 +56,16 @@ export default function UserPostsMobile({
               <span className="text-xs text-gray-500 font-medium">
                 {post.likeCount} ❤️
               </span>
+              {post.tags &&
+                post.tags.length > 0 &&
+                post.tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-md text-[10px] font-medium"
+                  >
+                    {tag.name}
+                  </span>
+                ))}
               <div className="flex gap-4 text-sm font-medium">
                 <button
                   onClick={() => onEditClick(post)}

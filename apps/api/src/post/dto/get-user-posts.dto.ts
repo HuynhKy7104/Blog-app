@@ -1,4 +1,3 @@
-// src/post/dto/get-user-posts.dto.ts
 import { InputType, Field, Int } from '@nestjs/graphql';
 import {
   IsOptional,
@@ -8,7 +7,9 @@ import {
   IsInt,
   IsArray,
   Min,
+  IsDate,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { PostSortBy } from './post-sort-by.enum';
 import { DEFAULT_PAGE_SIZE } from '../../../constants';
 
@@ -34,6 +35,18 @@ export class GetUserPostsInput {
   @IsArray()
   @IsInt({ each: true })
   tagIds?: number[];
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  startDate?: Date;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
 
   @Field(() => Int, { nullable: true, defaultValue: 0 })
   @IsOptional()

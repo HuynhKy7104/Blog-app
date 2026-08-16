@@ -56,25 +56,35 @@ export const fetchUserPosts = async ({
   page,
   pageSize,
   search,
-  isPublished,
-  sortBy = "NEWEST",
+  status,
+  sortBy,
+  startDate,
+  endDate,
 }: {
-  page?: number;
-  pageSize?: number;
+  page: number;
+  pageSize: number;
   search?: string;
-  isPublished?: boolean;
+  status?: string;
   sortBy?: string;
+  startDate?: string;
+  endDate?: string;
 }) => {
   const session = await getSession();
 
   const { skip, take } = transformTakeSkip({ page, pageSize });
 
+  let isPublished = undefined;
+  if (status === "PUBLISHED") isPublished = true;
+  if (status === "DRAFT") isPublished = false;
+
   const input = {
     skip,
     take,
-    search: search || undefined,
-    isPublished,
-    sortBy,
+    ...(search && { search: search }),
+    ...(isPublished !== undefined && { isPublished }),
+    ...(sortBy && { sortBy: sortBy }), // ví dụ: 'NEWEST', 'MOST_LIKES'
+    ...(startDate && { startDate: startDate }), // Chuỗi ISO Date
+    ...(endDate && { endDate: endDate }), // Chuỗi ISO Date
   };
 
   const result = await fetchGraphQL(
@@ -107,6 +117,7 @@ export const updateUserPost = async (
     content?: string;
     thumbnail?: string;
     published?: boolean;
+    tagIds?: number[];
   },
 ) => {
   const session = await getSession();

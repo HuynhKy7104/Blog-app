@@ -23,6 +23,32 @@ export default function EditPostModal({
 
   const queryClient = useQueryClient();
 
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
+    post?.tags?.map((t) => Number(t.id)) || [],
+  );
+
+  // MÔ PHỎNG DANH SÁCH TAGS CÓ SẴN (Bạn có thể thay bằng API lấy tags thực tế sau này)
+  const AVAILABLE_TAGS = [
+    { id: 1, name: "Công nghệ" },
+    { id: 2, name: "Du lịch" },
+    { id: 3, name: "Ẩm thực" },
+    { id: 4, name: "Thể thao" },
+    { id: 5, name: "Giải trí" },
+    { id: 6, name: "Giáo dục" },
+    { id: 7, name: "Sức khoẻ" },
+    { id: 8, name: "Kinh doanh" },
+  ];
+
+  // Hàm xử lý khi bấm vào một thẻ Thể loại
+  const toggleTag = (tagId: number) => {
+    setSelectedTagIds(
+      (prev) =>
+        prev.includes(tagId)
+          ? prev.filter((id) => id !== tagId) // Nếu đã chọn thì bỏ chọn
+          : [...prev, tagId], // Nếu chưa chọn thì thêm vào
+    );
+  };
+
   useEffect(() => {
     if (post && isOpen) {
       setTitle(post.title || "");
@@ -30,11 +56,23 @@ export default function EditPostModal({
       setThumbnail(post.thumbnail || "");
       setPublished(post.published || false);
     }
+
+    if (post?.tags) {
+      setSelectedTagIds(post.tags.map((t) => Number(t.id)));
+    } else {
+      setSelectedTagIds([]);
+    }
   }, [post, isOpen]);
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: () =>
-      updateUserPost(post?.id, { title, content, thumbnail, published }),
+      updateUserPost(post?.id, {
+        title,
+        content,
+        thumbnail,
+        published,
+        tagIds: selectedTagIds,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userPosts"] });
       onClose();
@@ -114,6 +152,32 @@ export default function EditPostModal({
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
                 placeholder="Nhập nội dung bài viết..."
               ></textarea>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Thể loại bài viết
+              </label>
+              <div className="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-md bg-gray-50 max-h-32 overflow-y-auto">
+                {AVAILABLE_TAGS.map((tag) => {
+                  const isSelected = selectedTagIds.includes(tag.id);
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => toggleTag(tag.id)}
+                      className={`px-3 py-1 text-sm rounded-full transition-all border ${
+                        isSelected
+                          ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                          : "bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600"
+                      }`}
+                    >
+                      {isSelected ? "✓ " : "+ "}
+                      {tag.name}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="flex items-center gap-2 mt-2">

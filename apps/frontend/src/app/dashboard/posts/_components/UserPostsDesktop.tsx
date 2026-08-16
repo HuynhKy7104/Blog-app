@@ -21,11 +21,17 @@ export default function UserPostsDesktop({
             <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Hình ảnh
             </th>
-            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+
+            {/* BỎ whitespace-nowrap Ở CỘT TIÊU ĐỀ và thêm min-w-[250px] để nó có không gian tự rớt dòng */}
+            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-62.5">
               Tiêu đề
             </th>
+
             <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Trạng thái
+            </th>
+            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              Thể loại
             </th>
             <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Ngày tạo
@@ -41,6 +47,7 @@ export default function UserPostsDesktop({
             </th>
           </tr>
         </thead>
+
         <tbody className="bg-white divide-y divide-gray-100">
           {posts.map((post: Post) => (
             <tr
@@ -60,7 +67,7 @@ export default function UserPostsDesktop({
                   </div>
                 )}
               </td>
-              <td className="px-5 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+              <td className="px-5 py-3 text-sm font-medium text-gray-900 leading-snug">
                 {post.title}
               </td>
               <td className="px-5 py-3 whitespace-nowrap text-sm">
@@ -73,6 +80,22 @@ export default function UserPostsDesktop({
                     Bản nháp
                   </span>
                 )}
+              </td>
+              <td className="px-5 py-3 text-sm">
+                <div className="flex flex-wrap gap-1">
+                  {post.tags && post.tags.length > 0 ? (
+                    post.tags.map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-md text-xs font-medium"
+                      >
+                        {tag.name}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-gray-400 text-xs italic">Chưa có</span>
+                  )}
+                </div>
               </td>
               <td className="px-5 py-3 whitespace-nowrap text-sm text-gray-500">
                 {new Date(post.createdAt).toLocaleDateString("vi-VN")}

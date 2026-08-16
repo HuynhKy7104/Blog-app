@@ -46,10 +46,12 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 input GetUserPostsInput {
+  endDate: DateTime
   isPublished: Boolean
   search: String
   skip: Int = 0
   sortBy: PostSortBy
+  startDate: DateTime
   tagIds: [Int!]
   take: Int = 12
 }
@@ -95,10 +97,13 @@ type Post {
   updatedAt: DateTime!
 }
 
-"""Sort order for user posts"""
+"""Tùy chọn sắp xếp cho danh sách bài viết"""
 enum PostSortBy {
+  MOST_COMMENTS
+  MOST_LIKES
   NEWEST
   OLDEST
+  RECENTLY_UPDATED
 }
 
 type Query {

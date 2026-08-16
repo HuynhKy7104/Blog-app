@@ -1,11 +1,14 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum PostSortBy {
-  NEWEST = 'newest',
-  OLDEST = 'oldest',
+  NEWEST = 'NEWEST', // Mới nhất (Ngày tạo)
+  OLDEST = 'OLDEST', // Cũ nhất (Ngày tạo)
+  RECENTLY_UPDATED = 'RECENTLY_UPDATED', // Mới cập nhật (Ngày cập nhật)
+  MOST_LIKES = 'MOST_LIKES', // Nhiều lượt thích nhất
+  MOST_COMMENTS = 'MOST_COMMENTS', // Nhiều bình luận nhất
 }
 
 registerEnumType(PostSortBy, {
   name: 'PostSortBy',
-  description: 'Sort order for user posts',
+  description: 'Tùy chọn sắp xếp cho danh sách bài viết',
 });

@@ -9,18 +9,44 @@ import UserPostsDesktop from "./UserPostsDesktop";
 import EditPostModal from "./EditPostModal";
 import DeletePostModal from "./DeletePostModal";
 import { Post } from "@/lib/types/modelTypes";
+import PostSearchBar from "@/components/PostSearchBar";
+import PostFilterBar from "@/components/PostFilterBar";
 
 export default function UserPostsClient() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const pageSize = 10;
 
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("NEWEST");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [editingPost, setEditingPost] = useState<Post>();
   const [deletingPost, setDeletingPost] = useState<Post>();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["userPosts", page, search],
-    queryFn: () => fetchUserPosts({ page, pageSize, search }),
+    queryKey: ["userPosts", page, search, statusFilter, sortBy, startDate, endDate],
+    queryFn: () => {
+      const isoStartDate = startDate ? new Date(startDate).toISOString() : undefined;
+
+      let isoEndDate = undefined;
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        isoEndDate = end.toISOString();
+      }
+
+      return fetchUserPosts({
+        page,
+        pageSize,
+        search,
+        status: statusFilter,
+        sortBy,
+        startDate: isoStartDate,
+        endDate: isoEndDate,
+      });
+    },
     staleTime: 60 * 1000,
     placeholderData: keepPreviousData,
   });
@@ -47,26 +73,47 @@ export default function UserPostsClient() {
 
   return (
     <div className="flex flex-col gap-6 w-full min-w-0 mt-20">
-      {/* THANH ĐIỀU KHIỂN */}
-      <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 w-full">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full xl:w-auto">
-          <h1 className="text-2xl font-bold text-gray-800">Quản lý bài viết</h1>
-          <span className="bg-blue-50 text-blue-700 border border-blue-200 px-4 py-1.5 rounded-md text-sm font-semibold shadow-sm w-max">
-            Tổng cộng: {totalCount} bài
-          </span>
+      {/* THANH ĐIỀU KHIỂN CHÍNH */}
+      <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 w-full mb-6 flex flex-col gap-4">
+        {/* HÀNG 1: Tiêu đề ở trái | Tìm kiếm & Nút tạo mới ở phải */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
+          {/* Tiêu đề và tổng số bài */}
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-800">Quản lý bài viết</h1>
+            <span className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-md text-sm font-semibold shadow-sm">
+              Tổng cộng: {totalCount} bài
+            </span>
+          </div>
+
+          {/* Nhóm bên phải: Thanh tìm kiếm và Nút viết bài */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+            <div className="w-full sm:w-auto">
+              <PostSearchBar
+                value={search}
+                onChange={setSearch}
+                placeholder="Tìm kiếm bài viết..."
+              />
+            </div>
+
+            {/* Thêm w-full sm:w-auto để nút bấm rộng hết cỡ trên điện thoại */}
+            <button className="w-full sm:w-auto shrink-0 h-10 px-5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex justify-center items-center font-medium shadow-sm whitespace-nowrap">
+              + Viết bài mới
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
-          <input
-            type="text"
-            placeholder="Tìm kiếm bài viết..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        {/* HÀNG 2: Khu vực chứa các bộ lọc (Trạng thái, Sắp xếp, Khoảng thời gian) */}
+        <div className="pt-3 border-t border-gray-100 flex items-center w-full">
+          <PostFilterBar
+            status={statusFilter}
+            onChangeStatus={setStatusFilter}
+            sortBy={sortBy}
+            onChangeSortBy={setSortBy}
+            startDate={startDate}
+            onChangeStartDate={setStartDate}
+            endDate={endDate}
+            onChangeEndDate={setEndDate}
           />
-          <button className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex justify-center items-center font-medium shadow-sm whitespace-nowrap">
-            + Viết bài mới
-          </button>
         </div>
       </div>
 

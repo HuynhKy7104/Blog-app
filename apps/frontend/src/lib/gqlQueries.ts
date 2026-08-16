@@ -107,7 +107,10 @@ export const GET_USER_POSTS = gql`
         likeCount
         content
         updatedAt
-        # ...
+        tags {
+          id
+          name
+        }
       }
       totalCount
     }
