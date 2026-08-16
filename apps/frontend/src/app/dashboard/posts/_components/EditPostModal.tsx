@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { updateUserPost } from "@/lib/actions/postActions";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Post } from "@/lib/types/modelTypes";
+import { fetchAllTags } from "@/lib/actions/tagActions";
 
 type EditPostModalProps = {
   isOpen: boolean;
@@ -26,18 +27,6 @@ export default function EditPostModal({
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     post?.tags?.map((t) => Number(t.id)) || [],
   );
-
-  // MÔ PHỎNG DANH SÁCH TAGS CÓ SẴN (Bạn có thể thay bằng API lấy tags thực tế sau này)
-  const AVAILABLE_TAGS = [
-    { id: 1, name: "Công nghệ" },
-    { id: 2, name: "Du lịch" },
-    { id: 3, name: "Ẩm thực" },
-    { id: 4, name: "Thể thao" },
-    { id: 5, name: "Giải trí" },
-    { id: 6, name: "Giáo dục" },
-    { id: 7, name: "Sức khoẻ" },
-    { id: 8, name: "Kinh doanh" },
-  ];
 
   // Hàm xử lý khi bấm vào một thẻ Thể loại
   const toggleTag = (tagId: number) => {
@@ -63,6 +52,12 @@ export default function EditPostModal({
       setSelectedTagIds([]);
     }
   }, [post, isOpen]);
+
+  const { data: allTags, isLoading: isTagsLoading } = useQuery({
+    queryKey: ["allTags"],
+    queryFn: fetchAllTags,
+    enabled: isOpen,
+  });
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: () =>
@@ -154,18 +149,21 @@ export default function EditPostModal({
               ></textarea>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Thể loại bài viết
-              </label>
-              <div className="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-md bg-gray-50 max-h-32 overflow-y-auto">
-                {AVAILABLE_TAGS.map((tag) => {
-                  const isSelected = selectedTagIds.includes(tag.id);
+            {/* KHU VỰC VẼ NÚT CHỌN THỂ LOẠI */}
+            <div className="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-md bg-gray-50 max-h-32 overflow-y-auto">
+              {isTagsLoading ? (
+                <span className="text-sm text-gray-500">
+                  Đang tải danh sách thể loại...
+                </span>
+              ) : allTags && allTags.length > 0 ? (
+                allTags.map((tag: { id: string | number; name: string }) => {
+                  const isSelected = selectedTagIds.includes(Number(tag.id));
+
                   return (
                     <button
                       key={tag.id}
                       type="button"
-                      onClick={() => toggleTag(tag.id)}
+                      onClick={() => toggleTag(Number(tag.id))}
                       className={`px-3 py-1 text-sm rounded-full transition-all border ${
                         isSelected
                           ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
@@ -176,8 +174,12 @@ export default function EditPostModal({
                       {tag.name}
                     </button>
                   );
-                })}
-              </div>
+                })
+              ) : (
+                <span className="text-sm text-gray-500">
+                  Chưa có thể loại nào trong hệ thống.
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 mt-2">

@@ -9,6 +9,10 @@ export const GET_POSTS = gql`
       content
       createdAt
       slug
+      tags {
+        id
+        name
+      }
     }
 
     postCount
@@ -133,5 +137,14 @@ export const UPDATE_POST_MUTATION = gql`
 export const DELETE_POST_MUTATION = gql`
   mutation DeleteUserPost($postId: Int!) {
     deleteUserPost(postId: $postId)
+  }
+`;
+
+export const GET_TAGS = gql`
+  query {
+    tags {
+      id
+      name
+    }
   }
 `;

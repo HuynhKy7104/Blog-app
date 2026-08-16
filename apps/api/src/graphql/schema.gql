@@ -27,11 +27,6 @@ type Comment {
   updatedAt: DateTime!
 }
 
-input CreateTagInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 input CreateUserInput {
   avatar: String
   bio: String
@@ -68,13 +63,10 @@ type Like {
 type Mutation {
   CreateUser(signUpInput: SignUpInput!): Auth!
   createPostComment(content: String!, postId: Int!): Comment!
-  createTag(createTagInput: CreateTagInput!): Tag!
   createUser(createUserInput: CreateUserInput!): User!
   deleteUserPost(postId: Int!): Boolean!
   likePost(postId: Int!): Boolean!
-  removeTag(id: Int!): Tag!
   signIn(signInInput: SignInInput!): AuthPayload!
-  updateTag(updateTagInput: UpdateTagInput!): Tag!
   updateUser(id: Int!, updateUserInput: UpdateUserInput!): User!
   updateUserPost(postId: Int!, updateData: UpdatePostInput!): Post!
 }
@@ -113,7 +105,7 @@ type Query {
   postCommentCount(postId: Int!): Int!
   postCount: Int!
   posts(skip: Float, take: Float): [Post!]!
-  tag(id: Int!): Tag!
+  tags: [Tag!]!
 }
 
 """Vai trò của người dùng"""
@@ -146,12 +138,6 @@ input UpdatePostInput {
   tagIds: [Int!]
   thumbnail: String
   title: String
-}
-
-input UpdateTagInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
 
 input UpdateUserInput {
