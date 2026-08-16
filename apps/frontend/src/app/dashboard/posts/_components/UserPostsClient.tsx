@@ -7,6 +7,7 @@ import Pagination from "@/components/pagination";
 import UserPostsMobile from "./UserPostsMobile";
 import UserPostsDesktop from "./UserPostsDesktop";
 import EditPostModal from "./EditPostModal";
+import DeletePostModal from "./DeletePostModal";
 import { Post } from "@/lib/types/modelTypes";
 
 export default function UserPostsClient() {
@@ -14,9 +15,10 @@ export default function UserPostsClient() {
   const [search, setSearch] = useState("");
   const pageSize = 10;
 
-  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [editingPost, setEditingPost] = useState<Post>();
+  const [deletingPost, setDeletingPost] = useState<Post>();
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["userPosts", page, search],
     queryFn: () => fetchUserPosts({ page, pageSize, search }),
     staleTime: 60 * 1000,
@@ -29,6 +31,10 @@ export default function UserPostsClient() {
 
   const handleEditClick = (post: Post) => {
     setEditingPost(post);
+  };
+
+  const handleDeleteClick = (post: Post) => {
+    setDeletingPost(post);
   };
 
   if (isError) {
@@ -82,10 +88,12 @@ export default function UserPostsClient() {
             <UserPostsMobile
               posts={posts}
               onEditClick={handleEditClick}
+              onDeleteClick={handleDeleteClick}
             />
             <UserPostsDesktop
               posts={posts}
               onEditClick={handleEditClick}
+              onDeleteClick={handleDeleteClick}
             />
           </>
         )}
@@ -106,8 +114,14 @@ export default function UserPostsClient() {
       <EditPostModal
         isOpen={!!editingPost}
         post={editingPost as Post}
-        onClose={() => setEditingPost(null)}
-        onSuccess={() => refetch()}
+        onClose={() => setEditingPost(undefined)}
+      />
+
+      {/* HỘP THOẠI XÓA BÀI VIẾT */}
+      <DeletePostModal
+        isOpen={!!deletingPost}
+        post={deletingPost as Post}
+        onClose={() => setDeletingPost(undefined)}
       />
     </div>
   );

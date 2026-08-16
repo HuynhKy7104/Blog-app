@@ -9,7 +9,6 @@ type EditPostModalProps = {
   isOpen: boolean;
   onClose: () => void;
   post: Post;
-  onSuccess: () => void;
 };
 
 export default function EditPostModal({

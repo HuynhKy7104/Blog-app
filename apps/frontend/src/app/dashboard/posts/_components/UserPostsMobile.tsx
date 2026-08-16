@@ -5,9 +5,14 @@ import { Post } from "@/lib/types/modelTypes";
 type Props = {
   posts: Post[];
   onEditClick: (post: Post) => void;
+  onDeleteClick: (post: Post) => void;
 };
 
-export default function UserPostsMobile({ posts, onEditClick }: Props) {
+export default function UserPostsMobile({
+  posts,
+  onEditClick,
+  onDeleteClick,
+}: Props) {
   return (
     <div className="md:hidden divide-y divide-gray-100">
       {posts.map((post: Post) => (
@@ -58,7 +63,10 @@ export default function UserPostsMobile({ posts, onEditClick }: Props) {
                 >
                   Sửa
                 </button>
-                <button className="text-red-600 hover:text-red-800 transition-colors">
+                <button
+                  onClick={() => onDeleteClick(post)}
+                  className="text-red-600 hover:text-red-800 transition-colors"
+                >
                   Xóa
                 </button>
               </div>

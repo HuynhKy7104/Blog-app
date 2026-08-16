@@ -65,10 +65,10 @@ export class PostService {
       take = DEFAULT_PAGE_SIZE,
     } = input;
 
-    const orderByClause: { createdAt: 'asc' | 'desc' } =
+    const orderByClause: { updatedAt: 'asc' | 'desc' } =
       sortBy === PostSortBy.OLDEST
-        ? { createdAt: 'asc' }
-        : { createdAt: 'desc' };
+        ? { updatedAt: 'asc' }
+        : { updatedAt: 'desc' };
 
     const whereClause = {
       authorId: userId,

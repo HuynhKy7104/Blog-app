@@ -3,6 +3,7 @@
 import { print } from "graphql";
 import { fetchGraphQL } from "../fetchGraphQL";
 import {
+  DELETE_POST_MUTATION,
   GET_POST_BY_ID,
   GET_POSTS,
   GET_USER_POSTS,
@@ -144,4 +145,30 @@ export const updateUserPost = async (
   }
 
   return result.data.updateUserPost;
+};
+
+export const deleteUserPost = async (postId: number) => {
+  const session = await getSession();
+
+  if (!session?.accessToken) {
+    throw new Error("Bạn chưa đăng nhập!");
+  }
+
+  const result = await fetchGraphQL(
+    print(DELETE_POST_MUTATION),
+    { postId },
+    {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  );
+
+  if (result.errors) {
+    console.error(
+      "=== LỖI XÓA BÀI VIẾT ===",
+      JSON.stringify(result.errors, null, 2),
+    );
+    throw new Error(result.errors[0]?.message || "Không thể xóa bài viết lúc này.");
+  }
+
+  return true;
 };

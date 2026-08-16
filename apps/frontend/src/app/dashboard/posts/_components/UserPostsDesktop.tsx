@@ -5,9 +5,14 @@ import { Post } from "@/lib/types/modelTypes";
 type Props = {
   posts: Post[];
   onEditClick: (post: Post) => void;
+  onDeleteClick: (post: Post) => void;
 };
 
-export default function UserPostsDesktop({ posts, onEditClick }: Props) {
+export default function UserPostsDesktop({
+  posts,
+  onEditClick,
+  onDeleteClick,
+}: Props) {
   return (
     <div className="hidden md:block w-full overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -87,7 +92,10 @@ export default function UserPostsDesktop({ posts, onEditClick }: Props) {
                 >
                   Sửa
                 </button>
-                <button className="text-red-600 hover:text-red-800 hover:underline transition-all">
+                <button
+                  onClick={() => onDeleteClick(post)}
+                  className="text-red-600 hover:text-red-800 hover:underline transition-all"
+                >
                   Xóa
                 </button>
               </td>
