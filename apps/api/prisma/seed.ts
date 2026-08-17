@@ -8,13 +8,16 @@ import process from 'process';
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+// --- CÁC HẰNG SỐ CẤU HÌNH ---
 const TOTAL_USERS = 20;
-const TOTAL_POSTS = 150;
+const MIN_POSTS_PER_USER = 15;
+const MAX_POSTS_PER_USER = 20;
 const MAX_COMMENTS_PER_POST = 15;
 const MAX_LIKES_PER_POST = 15;
 const PUBLISHED_RATIO = 0.8; // 80% post published, 20% draft
 const BATCH_SIZE = 20;
 
+// --- CÁC HÀM TIỆN ÍCH ---
 function generateSlug(title: string): string {
   return title
     .normalize('NFD')
@@ -36,6 +39,16 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return result;
 }
 
+// Hàm sinh ngày tạo và ngày cập nhật hợp lý trong vòng 2 năm qua
+function generateTimestamps() {
+  const createdAt = faker.date.past({ years: 2 });
+  const updatedAt = faker.datatype.boolean()
+    ? faker.date.between({ from: createdAt, to: new Date() })
+    : createdAt;
+  return { createdAt, updatedAt };
+}
+
+// --- HÀM CHÍNH ---
 async function main() {
   console.time('Seed time');
 
@@ -58,6 +71,7 @@ async function main() {
       avatar: faker.image.avatar(),
       password: defaultPassword,
       role: i === 0 ? 'ADMIN' : 'USER',
+      ...generateTimestamps(),
     })),
   });
 
@@ -80,18 +94,30 @@ async function main() {
   await prisma.tag.createMany({ data: tagNames.map((name) => ({ name })) });
   const allTags = await prisma.tag.findMany({ select: { id: true } });
 
-  // 4. Seed post
-  const postInputs = Array.from({ length: TOTAL_POSTS }).map((_, i) => {
-    const title = faker.lorem.sentence();
-    return {
-      title,
-      slug: `${generateSlug(title)}-${i}`,
-      content: faker.lorem.paragraphs(3),
-      thumbnail: faker.image.url(),
-      authorId: faker.helpers.arrayElement(allUserIds),
-      published: faker.datatype.boolean({ probability: PUBLISHED_RATIO }),
-    };
-  });
+  // 4. Seed post (Đảm bảo mỗi User có 15-20 bài)
+  const postInputs: any[] = [];
+  let postCounter = 0;
+
+  for (const userId of allUserIds) {
+    const numPosts = faker.number.int({
+      min: MIN_POSTS_PER_USER,
+      max: MAX_POSTS_PER_USER,
+    });
+
+    for (let i = 0; i < numPosts; i++) {
+      const title = faker.lorem.sentence();
+      postInputs.push({
+        title,
+        slug: `${generateSlug(title)}-${postCounter++}`,
+        content: faker.lorem.paragraphs(3),
+        thumbnail: faker.image.url(),
+        authorId: userId,
+        published: faker.datatype.boolean({ probability: PUBLISHED_RATIO }),
+        views: faker.number.int({ min: 10, max: 5000 }),
+        ...generateTimestamps(),
+      });
+    }
+  }
 
   await prisma.post.createMany({ data: postInputs });
 
@@ -130,12 +156,16 @@ async function main() {
                 data: Array.from({ length: commentCount }).map(() => ({
                   content: faker.lorem.sentence(),
                   authorId: faker.helpers.arrayElement(allUserIds),
+                  ...generateTimestamps(),
                 })),
               },
             },
             likes: {
               createMany: {
-                data: likeUserIds.map((userId) => ({ userId })),
+                data: likeUserIds.map((userId) => ({
+                  userId,
+                  createdAt: faker.date.past({ years: 1 }),
+                })),
               },
             },
           },

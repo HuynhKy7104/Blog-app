@@ -13,6 +13,7 @@ import {
 import { Post } from "../types/modelTypes";
 import { transformTakeSkip } from "../helpers";
 import { getSession } from "../sessions";
+import { DEFAULT_POSTS_SIZE } from "../constants";
 
 export const fetchPosts = async ({
   page,
@@ -54,7 +55,7 @@ export const likePost = async (postId: number) => {
 
 export const fetchUserPosts = async ({
   page,
-  pageSize,
+  pageSize = DEFAULT_POSTS_SIZE,
   search,
   status,
   sortBy,

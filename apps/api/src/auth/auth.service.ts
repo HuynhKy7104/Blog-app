@@ -31,6 +31,10 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('Không tìm thấy người dùng!');
 
+    if (!user.password) {
+      throw new Error('Tài khoản hoặc mật khẩu không đúng');
+    }
+
     const passwordMatched = await verify(user.password, password);
     if (!passwordMatched)
       throw new UnauthorizedException('Mật khẩu không hợp lệ');

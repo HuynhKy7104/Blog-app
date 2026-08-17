@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { DEFAULT_PAGE_SIZE } from '../../constants';
+import { DEFAULT_PAGE_SIZE, DEFAULT_POSTS_SIZE } from '../../constants';
 import { UpdatePostInput } from './dto/update-post.input';
 import { GetUserPostsInput } from './dto/get-user-posts.dto';
 import { PostSortBy } from './dto/post-sort-by.enum';
@@ -51,7 +51,7 @@ export class PostService {
       startDate,
       endDate,
       skip = 0,
-      take = DEFAULT_PAGE_SIZE,
+      take = DEFAULT_POSTS_SIZE,
     } = input;
 
     // 2. TẠO WHERE CLAUSE VỚI KIỂU DỮ LIỆU CHUẨN CỦA PRISMA VÀ CÚ PHÁP SPREAD

@@ -11,11 +11,12 @@ import DeletePostModal from "./DeletePostModal";
 import { Post } from "@/lib/types/modelTypes";
 import PostSearchBar from "@/components/PostSearchBar";
 import PostFilterBar from "@/components/PostFilterBar";
+import { DEFAULT_POSTS_SIZE } from "@/lib/constants";
 
 export default function UserPostsClient() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const pageSize = 10;
+  const pageSize = DEFAULT_POSTS_SIZE;
 
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("NEWEST");

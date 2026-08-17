@@ -43,6 +43,7 @@ model Post {
   content   String
   thumbnail String?
   published Boolean @default(false)
+  views     Int     @default(0)
 
   tags Tag[]
 
