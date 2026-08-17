@@ -124,15 +124,75 @@ export default function EditPostModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Liên kết ảnh thu nhỏ (URL)
+                Ảnh thu nhỏ (Thumbnail)
               </label>
-              <input
-                type="text"
-                value={thumbnail}
-                onChange={(e) => setThumbnail(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
+
+              <div className="flex flex-col gap-3">
+                {/* Lựa chọn 1: Dán URL */}
+                <input
+                  type="text"
+                  value={thumbnail}
+                  onChange={(e) => setThumbnail(e.target.value)}
+                  placeholder="Dán liên kết ảnh (https://...)"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+                />
+
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                  <span className="text-xs text-gray-400 font-medium">HOẶC</span>
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                </div>
+
+                {/* Lựa chọn 2: Nút chọn tệp từ máy tính */}
+                <div className="flex items-center justify-center w-full">
+                  <label
+                    htmlFor="thumbnail-upload"
+                    className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <span className="text-2xl mb-1">📁</span>
+                      <p className="text-xs text-gray-500">
+                        <span className="font-semibold text-blue-600">
+                          Nhấn để tải ảnh lên
+                        </span>{" "}
+                        (Tính năng đang phát triển)
+                      </p>
+                    </div>
+                    {/* Thẻ input type="file" bị ẩn đi, kích hoạt khi bấm vào thẻ label */}
+                    <input
+                      id="thumbnail-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          alert(
+                            `Bạn vừa chọn tệp: ${file.name}. Hiện tại tôi chưa tìm được cách tối ưu nếu gửi ảnh từ máy. Sorry sir, sau này sẽ cập nhật`,
+                          );
+                          // Logic tương lai: await uploadFileToBackend(file);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+
+                {/* Hiển thị ảnh xem trước nếu đã có URL */}
+                {thumbnail && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 mb-1">Xem trước:</p>
+                    <img
+                      src={thumbnail}
+                      alt="Thumbnail preview"
+                      className="w-full h-32 object-cover rounded-md border border-gray-200"
+                      onError={(e) => {
+                        // Ẩn ảnh nếu URL bị lỗi
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>

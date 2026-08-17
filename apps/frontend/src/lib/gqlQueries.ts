@@ -1,27 +1,30 @@
 import gql from "graphql-tag";
 
 export const GET_POSTS = gql`
-  query posts($skip: Float!, $take: Float!) {
-    posts(skip: $skip, take: $take) {
-      id
-      title
-      thumbnail
-      content
-      createdAt
-      slug
-      likeCount
-      commentCount
-      tags {
+  query GetPosts($input: GetPostsInput) {
+    posts(input: $input) {
+      posts {
         id
-        name
+        title
+        slug
+        thumbnail
+        content
+        createdAt
+        updatedAt
+        published
+        views
+        likeCount
+        commentCount
+        author {
+          name
+        }
+        tags {
+          id
+          name
+        }
       }
-
-      author {
-        name
-      }
+      totalCount
     }
-
-    postCount
   }
 `;
 
@@ -117,6 +120,7 @@ export const GET_USER_POSTS = gql`
         likeCount
         content
         updatedAt
+        views
         tags {
           id
           name

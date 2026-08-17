@@ -13,19 +13,69 @@ import {
 import { Post } from "../types/modelTypes";
 import { transformTakeSkip } from "../helpers";
 import { getSession } from "../sessions";
-import { DEFAULT_POSTS_SIZE } from "../constants";
+import { DEFAULT_PAGE_SIZE, DEFAULT_POSTS_SIZE } from "../constants";
 
-export const fetchPosts = async ({
-  page,
-  pageSize,
-}: {
-  page?: number;
+// 1. TẠO KIỂU DỮ LIỆU CHUNG
+export type FetchPostsParams = {
+  page: number;
   pageSize?: number;
-}) => {
+  search?: string;
+  status?: string;
+  sortBy?: string;
+  startDate?: string;
+  endDate?: string;
+  tagIds?: number[];
+};
+
+// 2. HÀM TIỆN ÍCH DÙNG CHUNG: Lắp ráp biến input cho GraphQL
+const buildPostQueryInput = (params: FetchPostsParams) => {
+  const { page, pageSize, search, status, sortBy, startDate, endDate, tagIds } =
+    params;
+
+  // Tính toán phân trang
   const { skip, take } = transformTakeSkip({ page, pageSize });
 
-  const result = await fetchGraphQL(print(GET_POSTS), { skip, take });
-  return { posts: result.data.posts as Post[], totalPosts: result.data.postCount };
+  // Xử lý trạng thái xuất bản
+  let isPublished = undefined;
+  if (status === "PUBLISHED") isPublished = true;
+  if (status === "DRAFT") isPublished = false;
+
+  // Trả về object input hoàn chỉnh
+  return {
+    skip,
+    take,
+    ...(search && { search }),
+    ...(isPublished !== undefined && { isPublished }),
+    ...(sortBy && { sortBy }),
+    ...(startDate && { startDate }),
+    ...(endDate && { endDate }),
+    ...(tagIds && tagIds.length > 0 && { tagIds }),
+  };
+};
+
+export const fetchPosts = async (params: FetchPostsParams) => {
+  const input = buildPostQueryInput(params);
+  const pageSize = params.pageSize || DEFAULT_PAGE_SIZE;
+
+  const result = await fetchGraphQL(print(GET_POSTS), { input });
+
+  if (result.errors || !result.data) {
+    console.error(
+      "=== LỖI TỪ GRAPHQL BACKEND (getPosts) ===",
+      JSON.stringify(result.errors, null, 2),
+    );
+    return { posts: [], totalCount: 0, currentPage: params.page, totalPages: 0 };
+  }
+
+  const totalCount = result.data.posts.totalCount as number;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  return {
+    posts: result.data.posts.posts as Post[],
+    totalCount,
+    currentPage: params.page,
+    totalPages,
+  };
 };
 
 export const fetchPostById = async (id: number) => {
@@ -53,61 +103,34 @@ export const likePost = async (postId: number) => {
   return result.data;
 };
 
-export const fetchUserPosts = async ({
-  page,
-  pageSize = DEFAULT_POSTS_SIZE,
-  search,
-  status,
-  sortBy,
-  startDate,
-  endDate,
-}: {
-  page: number;
-  pageSize: number;
-  search?: string;
-  status?: string;
-  sortBy?: string;
-  startDate?: string;
-  endDate?: string;
-}) => {
+export const fetchUserPosts = async (params: FetchPostsParams) => {
   const session = await getSession();
 
-  const { skip, take } = transformTakeSkip({ page, pageSize });
-
-  let isPublished = undefined;
-  if (status === "PUBLISHED") isPublished = true;
-  if (status === "DRAFT") isPublished = false;
-
-  const input = {
-    skip,
-    take,
-    ...(search && { search: search }),
-    ...(isPublished !== undefined && { isPublished }),
-    ...(sortBy && { sortBy: sortBy }), // ví dụ: 'NEWEST', 'MOST_LIKES'
-    ...(startDate && { startDate: startDate }), // Chuỗi ISO Date
-    ...(endDate && { endDate: endDate }), // Chuỗi ISO Date
-  };
+  const input = buildPostQueryInput(params);
+  const pageSize = params.pageSize || DEFAULT_POSTS_SIZE;
 
   const result = await fetchGraphQL(
     print(GET_USER_POSTS),
     { input },
-    {
-      Authorization: `Bearer ${session?.accessToken}`,
-    },
+    { Authorization: `Bearer ${session?.accessToken}` },
   );
 
   if (result.errors || !result.data) {
     console.error(
-      "=== LỖI TỪ GRAPHQL BACKEND ===",
+      "=== LỖI TỪ GRAPHQL BACKEND (getUserPosts) ===",
       JSON.stringify(result.errors, null, 2),
     );
-
-    return { posts: [], totalCount: 0 };
+    return { posts: [], totalCount: 0, currentPage: params.page, totalPages: 0 };
   }
+
+  const totalCount = result.data.getUserPosts.totalCount as number;
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return {
     posts: result.data.getUserPosts.posts as Post[],
-    totalCount: result.data.getUserPosts.totalCount as number,
+    totalCount,
+    currentPage: params.page,
+    totalPages,
   };
 };
 

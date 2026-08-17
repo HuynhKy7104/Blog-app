@@ -2,6 +2,7 @@ import { fetchPosts } from "@/lib/actions/postActions";
 import Hero from "../components/hero";
 import Posts from "@/components/Posts";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { zstdDecompress } from "zlib";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

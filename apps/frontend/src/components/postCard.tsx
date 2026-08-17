@@ -2,10 +2,7 @@ import { Post } from "@/lib/types/modelTypes";
 import Image from "next/image";
 import Link from "next/link";
 
-type Props = Partial<Post> & {
-  likeCount?: number;
-  commentCount?: number;
-};
+type Props = Partial<Post>;
 
 const PostCard = ({
   title,
@@ -18,10 +15,11 @@ const PostCard = ({
   tags,
   likeCount = 0,
   commentCount = 0,
+  views = 0, // Đặt giá trị mặc định là 0 nếu chưa có lượt xem
 }: Props) => {
   return (
     <div className="flex flex-col h-full bg-primary-950/70 backdrop-blur-sm border border-white/10 rounded-lg shadow-lg shadow-primary-950/20 overflow-hidden hover:border-primary-400 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-1 transition-all">
-      {/* 1. Kéo Thể loại (Tags) lên đè góc trên của hình ảnh cho hiện đại */}
+      {/* Kéo Thể loại (Tags) lên đè góc trên của hình ảnh */}
       <div className="relative w-full aspect-video">
         <Image
           src={thumbnail ?? "/no-image.png"}
@@ -34,7 +32,6 @@ const PostCard = ({
         {tags && tags.length > 0 && (
           <div className="absolute top-3 left-3 flex flex-wrap gap-1">
             {tags.slice(0, 2).map((tag) => (
-              // Hiển thị tối đa 2 tags để không che mất hình
               <span
                 key={tag.id}
                 className="px-2 py-1 text-[10px] font-bold text-white bg-black/60 backdrop-blur-md rounded-md"
@@ -47,10 +44,10 @@ const PostCard = ({
       </div>
 
       <div className="flex flex-col flex-1 p-4">
-        {/* 2. Tiêu đề */}
+        {/* Tiêu đề */}
         <h3 className="text-lg font-bold text-white line-clamp-2">{title}</h3>
 
-        {/* 3. Tác giả & Ngày tháng */}
+        {/* Tác giả & Ngày tháng */}
         <div className="flex items-center gap-2 mt-2 text-xs text-primary-200/60">
           <span className="font-medium text-primary-100">
             {author?.name ?? "Ẩn danh"}
@@ -61,15 +58,40 @@ const PostCard = ({
           </span>
         </div>
 
-        {/* 4. Đoạn trích nội dung */}
+        {/* Đoạn trích nội dung */}
         {content && (
           <p className="text-sm text-primary-100/70 mt-3 line-clamp-3">{content}</p>
         )}
 
-        {/* 5. Dòng dưới cùng: Tương tác và Nút Đọc thêm */}
+        {/* Dòng dưới cùng: Tương tác và Nút Đọc thêm */}
         <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
           <div className="flex items-center gap-4 text-xs text-primary-200/60">
-            {/* Lượt thích */}
+            {/* 1. Lượt xem  */}
+            <div className="flex items-center gap-1">
+              <svg
+                className="w-4 h-4 text-green-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <span>{views}</span>
+            </div>
+
+            {/* 2. Lượt thích */}
             <div className="flex items-center gap-1">
               <svg
                 className="w-4 h-4 text-red-400"
@@ -84,7 +106,8 @@ const PostCard = ({
               </svg>
               <span>{likeCount}</span>
             </div>
-            {/* Lượt bình luận */}
+
+            {/* 3. Lượt bình luận */}
             <div className="flex items-center gap-1">
               <svg
                 className="w-4 h-4 text-blue-400"

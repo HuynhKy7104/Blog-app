@@ -46,6 +46,9 @@ export class Post {
   @Field()
   updatedAt!: Date;
 
+  @Field(() => Int)
+  views!: number;
+
   // ==========================================
   // THÊM TRƯỜNG ẢO
   // ==========================================

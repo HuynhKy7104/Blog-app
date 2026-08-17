@@ -40,6 +40,18 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input GetPostsInput {
+  authorId: Int
+  endDate: DateTime
+  isPublished: Boolean
+  search: String
+  skip: Int = 0
+  sortBy: PostSortBy
+  startDate: DateTime
+  tagIds: [Int!]
+  take: Int = 12
+}
+
 input GetUserPostsInput {
   endDate: DateTime
   isPublished: Boolean
@@ -88,12 +100,13 @@ type Post {
   thumbnail: String
   title: String!
   updatedAt: DateTime!
+  views: Int!
 }
 
 """Tùy chọn sắp xếp cho danh sách bài viết"""
 enum PostSortBy {
-  MOST_COMMENTS
   MOST_LIKES
+  MOST_VIEWS
   NEWEST
   OLDEST
   RECENTLY_UPDATED
@@ -105,7 +118,7 @@ type Query {
   getUserPosts(input: GetUserPostsInput): UserPostsResult!
   postCommentCount(postId: Int!): Int!
   postCount: Int!
-  posts(skip: Float, take: Float): [Post!]!
+  posts(input: GetPostsInput): UserPostsResult!
   tags: [Tag!]!
 }
 

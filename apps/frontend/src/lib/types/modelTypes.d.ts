@@ -11,7 +11,9 @@ export type Post = {
   createdAt: Date;
   updatedAt: Date;
   likeCount: number;
+  commentCount;
   isLiked: boolean;
+  views: number;
   _count: {
     likes: number;
     comments: number;

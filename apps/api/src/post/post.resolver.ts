@@ -15,9 +15,10 @@ import { CurrentUser } from '../auth/guards/jwt-auth/current-user.decorator';
 import type { AuthUser } from '../auth/types/auth-user.type';
 import { LikeService } from '../like/like.service';
 import { UpdatePostInput } from './dto/update-post.input';
-import { GetUserPostsInput } from './dto/get-user-posts.dto';
+import { GetUserPostsInput } from './dto/get-user-posts.input';
 import { UserPostsResult } from './entities/user-posts-result.entity';
 import { CommentService } from '../comment/comment.service';
+import { GetPostsInput } from './dto/get-posts.input';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -27,12 +28,12 @@ export class PostResolver {
     private readonly commentService: CommentService,
   ) {}
 
-  @Query(() => [Post], { name: 'posts' })
+  @Query(() => UserPostsResult, { name: 'posts' })
   findAll(
-    @Args('skip', { nullable: true }) skip?: number,
-    @Args('take', { nullable: true }) take?: number,
+    @Args('input', { nullable: true })
+    input: GetPostsInput = new GetPostsInput(),
   ) {
-    return this.postService.findAll(skip, take);
+    return this.postService.findAll(input);
   }
 
   @Query(() => Int, { name: 'postCount' })

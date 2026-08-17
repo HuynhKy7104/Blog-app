@@ -8,41 +8,36 @@ type Props = {
   onDeleteClick: (post: Post) => void;
 };
 
+// 1. HÀM TIỆN ÍCH: Cắt chuỗi theo số lượng từ (mặc định là 10 từ)
+const truncateTitle = (text: string, maxWords: number = 10) => {
+  if (!text) return "";
+  const words = text.trim().split(/\s+/); // Tách câu thành các từ dựa trên khoảng trắng
+  if (words.length > maxWords) {
+    return words.slice(0, maxWords).join(" ") + "...";
+  }
+  return text;
+};
+
 export default function UserPostsDesktop({
   posts,
   onEditClick,
   onDeleteClick,
 }: Props) {
   return (
-    <div className="hidden md:block w-full overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className="hidden md:block w-full overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+      <table className="min-w-full divide-y divide-gray-200 table-fixed">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Hình ảnh
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              Bài viết
             </th>
-
-            {/* BỎ whitespace-nowrap Ở CỘT TIÊU ĐỀ và thêm min-w-[250px] để nó có không gian tự rớt dòng */}
-            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-62.5">
-              Tiêu đề
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-32">
+              Thống kê
             </th>
-
-            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Trạng thái
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-40">
+              Thời gian
             </th>
-            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Thể loại
-            </th>
-            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Ngày tạo
-            </th>
-            <th className="px-5 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Ngày cập nhật
-            </th>
-            <th className="px-5 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Lượt thích
-            </th>
-            <th className="px-5 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">
               Thao tác
             </th>
           </tr>
@@ -52,75 +47,115 @@ export default function UserPostsDesktop({
           {posts.map((post: Post) => (
             <tr
               key={post.id}
-              className="hover:bg-gray-50 transition-colors"
+              className="hover:bg-blue-50/50 transition-colors group"
             >
-              <td className="px-5 py-3 whitespace-nowrap">
-                {post.thumbnail ? (
-                  <img
-                    src={post.thumbnail}
-                    alt={post.title}
-                    className="w-16 h-12 object-cover rounded-md border border-gray-200 shadow-sm"
-                  />
-                ) : (
-                  <div className="w-16 h-12 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-xs text-gray-400">
-                    Trống
+              {/* CỘT 1: THÔNG TIN BÀI VIẾT */}
+              <td className="px-6 py-5">
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0">
+                    {post.thumbnail ? (
+                      <img
+                        src={post.thumbnail}
+                        alt="thumbnail"
+                        className="w-20 h-14 object-cover rounded-md border border-gray-200 shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-20 h-14 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-xs text-gray-400">
+                        Trống
+                      </div>
+                    )}
                   </div>
-                )}
-              </td>
-              <td className="px-5 py-3 text-sm font-medium text-gray-900 leading-snug">
-                {post.title}
-              </td>
-              <td className="px-5 py-3 whitespace-nowrap text-sm">
-                {post.published ? (
-                  <span className="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-green-100 text-green-700">
-                    Đã xuất bản
-                  </span>
-                ) : (
-                  <span className="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-yellow-100 text-yellow-800">
-                    Bản nháp
-                  </span>
-                )}
-              </td>
-              <td className="px-5 py-3 text-sm">
-                <div className="flex flex-wrap gap-1">
-                  {post.tags && post.tags.length > 0 ? (
-                    post.tags.map((tag) => (
-                      <span
-                        key={tag.id}
-                        className="px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-md text-xs font-medium"
-                      >
-                        {tag.name}
+
+                  <div className="flex flex-col gap-2 min-w-0 flex-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                      {/* 2. ÁP DỤNG HÀM TRUNCATE TẠI ĐÂY */}
+                      <span className="text-sm font-semibold text-gray-900 leading-snug wrap-break-words">
+                        {truncateTitle(post.title, 10)}
                       </span>
-                    ))
-                  ) : (
-                    <span className="text-gray-400 text-xs italic">Chưa có</span>
-                  )}
+
+                      {post.published ? (
+                        <span className="shrink-0 px-2 py-0.5 inline-flex text-[10px] leading-4 font-bold rounded bg-green-100 text-green-700 uppercase tracking-wide w-max">
+                          Xuất bản
+                        </span>
+                      ) : (
+                        <span className="shrink-0 px-2 py-0.5 inline-flex text-[10px] leading-4 font-bold rounded bg-yellow-100 text-yellow-800 uppercase tracking-wide w-max">
+                          Bản nháp
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {post.tags && post.tags.length > 0 ? (
+                        <>
+                          {post.tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag.id}
+                              className="px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded text-xs"
+                            >
+                              #{tag.name}
+                            </span>
+                          ))}
+                          {post.tags.length > 3 && (
+                            <span className="px-2 py-0.5 bg-gray-50 text-gray-500 rounded text-xs font-medium">
+                              +{post.tags.length - 3}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-gray-400 text-xs italic">
+                          Chưa phân loại
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </td>
-              <td className="px-5 py-3 whitespace-nowrap text-sm text-gray-500">
-                {new Date(post.createdAt).toLocaleDateString("vi-VN")}
+
+              {/* CỘT 2: THỐNG KÊ */}
+              <td className="px-6 py-5 whitespace-nowrap">
+                <div className="flex flex-col gap-1.5 text-sm text-gray-600">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-gray-400">👁️</span>
+                    <span className="font-medium">{post.views}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-gray-400">❤️</span>
+                    <span className="font-medium">{post.likeCount}</span>
+                  </div>
+                </div>
               </td>
-              <td className="px-5 py-3 whitespace-nowrap text-sm text-gray-500">
-                {post.updatedAt
-                  ? new Date(post.updatedAt).toLocaleDateString("vi-VN")
-                  : "Chưa cập nhật"}
+
+              {/* CỘT 3: THỜI GIAN */}
+              <td className="px-6 py-5 whitespace-nowrap">
+                <div className="flex flex-col gap-1 text-sm">
+                  <div className="text-gray-900 font-medium">
+                    {new Date(post.createdAt).toLocaleDateString("vi-VN")}
+                  </div>
+                  <div className="text-gray-500 text-xs">
+                    Sửa:{" "}
+                    {post.updatedAt
+                      ? new Date(post.updatedAt).toLocaleDateString("vi-VN")
+                      : "---"}
+                  </div>
+                </div>
               </td>
-              <td className="px-5 py-3 whitespace-nowrap text-sm text-gray-500 text-right font-medium">
-                {post.likeCount} ❤️
-              </td>
-              <td className="px-5 py-3 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  onClick={() => onEditClick(post)}
-                  className="text-blue-600 hover:text-blue-800 hover:underline mr-4 transition-all"
-                >
-                  Sửa
-                </button>
-                <button
-                  onClick={() => onDeleteClick(post)}
-                  className="text-red-600 hover:text-red-800 hover:underline transition-all"
-                >
-                  Xóa
-                </button>
+
+              {/* CỘT 4: THAO TÁC */}
+              <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
+                <div className="flex flex-col items-end gap-2">
+                  <button
+                    onClick={() => onEditClick(post)}
+                    className="text-blue-600 hover:text-blue-800 hover:underline transition-all"
+                  >
+                    Sửa bài
+                  </button>
+                  <button
+                    onClick={() => onDeleteClick(post)}
+                    className="text-red-600 hover:text-red-800 hover:underline transition-all"
+                  >
+                    Xóa bài
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -5,7 +5,7 @@ export enum PostSortBy {
   OLDEST = 'OLDEST', // Cũ nhất (Ngày tạo)
   RECENTLY_UPDATED = 'RECENTLY_UPDATED', // Mới cập nhật (Ngày cập nhật)
   MOST_LIKES = 'MOST_LIKES', // Nhiều lượt thích nhất
-  MOST_COMMENTS = 'MOST_COMMENTS', // Nhiều bình luận nhất
+  MOST_VIEWS = 'MOST_VIEWS', // Nhiều lượt xem nhất
 }
 
 registerEnumType(PostSortBy, {

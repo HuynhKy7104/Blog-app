@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchUserPosts } from "@/lib/actions/postActions";
 import Pagination from "@/components/pagination";
@@ -25,6 +25,10 @@ export default function UserPostsClient() {
 
   const [editingPost, setEditingPost] = useState<Post>();
   const [deletingPost, setDeletingPost] = useState<Post>();
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, sortBy, startDate, endDate]);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["userPosts", page, search, statusFilter, sortBy, startDate, endDate],
