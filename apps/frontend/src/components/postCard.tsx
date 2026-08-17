@@ -3,10 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 type Props = Partial<Post> & {
-  likesCount?: number;
-  commentsCount?: number;
-  author?: { name: string };
-  tags?: { id: number; name: string }[];
+  likeCount?: number;
+  commentCount?: number;
 };
 
 const PostCard = ({
@@ -18,8 +16,8 @@ const PostCard = ({
   id,
   author,
   tags,
-  likesCount = 0,
-  commentsCount = 0,
+  likeCount = 0,
+  commentCount = 0,
 }: Props) => {
   return (
     <div className="flex flex-col h-full bg-primary-950/70 backdrop-blur-sm border border-white/10 rounded-lg shadow-lg shadow-primary-950/20 overflow-hidden hover:border-primary-400 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-1 transition-all">
@@ -84,7 +82,7 @@ const PostCard = ({
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{likesCount}</span>
+              <span>{likeCount}</span>
             </div>
             {/* Lượt bình luận */}
             <div className="flex items-center gap-1">
@@ -99,7 +97,7 @@ const PostCard = ({
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{commentsCount}</span>
+              <span>{commentCount}</span>
             </div>
           </div>
 

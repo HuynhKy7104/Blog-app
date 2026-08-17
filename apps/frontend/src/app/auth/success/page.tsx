@@ -16,7 +16,7 @@ export default function AuthSuccessPage() {
     const avatar = searchParams.get("avatar");
 
     const handleSetupSession = async () => {
-      if (accessToken && id) {
+      if (accessToken && id && refreshToken) {
         const sessionPayload = {
           user: {
             id: Number(id),
@@ -26,7 +26,7 @@ export default function AuthSuccessPage() {
           accessToken,
           refreshToken,
         };
-
+        console.log("AVATAR TRƯỚC KHI LƯU:", sessionPayload.user.avatar);
         await setupGoogleSessionAction(sessionPayload);
 
         const redirectURL = sessionStorage.getItem("oauth_redirect") || "/";

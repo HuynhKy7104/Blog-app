@@ -47,7 +47,7 @@ export class Post {
   updatedAt!: Date;
 
   // ==========================================
-  // THÊM 2 TRƯỜNG ẢO CHO TÍNH NĂNG LIKE TẠI ĐÂY
+  // THÊM TRƯỜNG ẢO
   // ==========================================
 
   @Field(() => Int, { defaultValue: 0 })
@@ -55,4 +55,7 @@ export class Post {
 
   @Field(() => Boolean, { defaultValue: false })
   isLiked?: boolean;
+
+  @Field(() => Int, { defaultValue: 0 })
+  commentCount?: number;
 }

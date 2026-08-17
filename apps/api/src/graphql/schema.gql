@@ -74,6 +74,7 @@ type Mutation {
 type Post {
   author: User
   authorId: Int!
+  commentCount: Int!
   comments: [Comment!]
   content: String!
   createdAt: DateTime!

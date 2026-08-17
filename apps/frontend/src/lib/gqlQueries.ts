@@ -9,8 +9,14 @@ export const GET_POSTS = gql`
       content
       createdAt
       slug
+      likeCount
+      commentCount
       tags {
         id
+        name
+      }
+
+      author {
         name
       }
     }

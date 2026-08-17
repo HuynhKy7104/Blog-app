@@ -3,7 +3,7 @@ import { jwtVerify, SignJWT } from "jose";
 import { redirect } from "next/navigation";
 
 export type SessionUser = {
-  id?: string;
+  id?: number;
   name?: string;
   avatar?: string;
 };

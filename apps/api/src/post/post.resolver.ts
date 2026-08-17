@@ -17,12 +17,14 @@ import { LikeService } from '../like/like.service';
 import { UpdatePostInput } from './dto/update-post.input';
 import { GetUserPostsInput } from './dto/get-user-posts.dto';
 import { UserPostsResult } from './entities/user-posts-result.entity';
+import { CommentService } from '../comment/comment.service';
 
 @Resolver(() => Post)
 export class PostResolver {
   constructor(
     private readonly postService: PostService,
     private readonly likeService: LikeService,
+    private readonly commentService: CommentService,
   ) {}
 
   @Query(() => [Post], { name: 'posts' })
@@ -45,17 +47,22 @@ export class PostResolver {
 
   @ResolveField(() => Int, { name: 'likeCount' })
   async likeCount(@Parent() { id }: Post) {
-    return this.postService.likeCount(id);
+    return this.likeService.likeCount(id);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ResolveField(() => Boolean, { name: 'isLiked' })
   async isLiked(@Parent() { id }: Post, @CurrentUser() user: AuthUser) {
     if (!user || !user.id) {
       return false;
     }
 
-    return this.postService.isLiked({ postId: id, userId: user.id });
+    return this.likeService.isLiked({ postId: id, userId: user.id });
+  }
+
+  @ResolveField(() => Int, { name: 'commentCount' })
+  async commentCount(@Parent() { id }: Post) {
+    return this.commentService.count(id);
   }
 
   @Mutation(() => Boolean)

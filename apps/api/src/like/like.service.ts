@@ -43,4 +43,22 @@ export class LikeService {
 
   //   return true;
   // }
+
+  async likeCount(id: number) {
+    return await this.prisma.like.count({
+      where: {
+        postId: id,
+      },
+    });
+  }
+
+  async isLiked({ postId, userId }: { postId: number; userId: number }) {
+    const likeRecord = await this.prisma.like.findFirst({
+      where: {
+        postId: postId,
+        userId: userId,
+      },
+    });
+    return !!likeRecord;
+  }
 }

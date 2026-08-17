@@ -18,6 +18,10 @@ export class PostService {
     return await this.prisma.post.findMany({
       skip,
       take,
+      include: {
+        tags: true,
+        author: true,
+      },
     });
   }
 
@@ -36,24 +40,6 @@ export class PostService {
         author: true,
       },
     });
-  }
-
-  async likeCount(id: number) {
-    return await this.prisma.like.count({
-      where: {
-        postId: id,
-      },
-    });
-  }
-
-  async isLiked({ postId, userId }: { postId: number; userId: number }) {
-    const likeRecord = await this.prisma.like.findFirst({
-      where: {
-        postId: postId,
-        userId: userId,
-      },
-    });
-    return !!likeRecord;
   }
 
   async getUserPosts(userId: number, input: GetUserPostsInput) {
@@ -142,15 +128,7 @@ export class PostService {
     return { posts, totalCount };
   }
 
-  async updateUserPost({
-    userId,
-    postId,
-    updateData,
-  }: {
-    userId: number;
-    postId: number;
-    updateData: UpdatePostInput;
-  }) {
+  private async findPostAndVerifyOwnership(postId: number, userId: number) {
     const post = await this.prisma.post.findUnique({ where: { id: postId } });
 
     if (!post) {
@@ -162,6 +140,20 @@ export class PostService {
         'Bạn không có quyền chỉnh sửa bài viết của người khác!',
       );
     }
+
+    return post;
+  }
+
+  async updateUserPost({
+    userId,
+    postId,
+    updateData,
+  }: {
+    userId: number;
+    postId: number;
+    updateData: UpdatePostInput;
+  }) {
+    await this.findPostAndVerifyOwnership(postId, userId);
 
     const { tagIds, ...rest } = updateData;
 
@@ -177,32 +169,12 @@ export class PostService {
   }
 
   async deleteUserPost({ userId, postId }: { userId: number; postId: number }) {
-    const post = await this.prisma.post.findUnique({
-      where: {
-        id: postId,
-      },
-    });
-
-    if (!post) {
-      throw new NotFoundException('Không tìm thấy bài viết này!');
-    }
-
-    if (post.authorId !== userId) {
-      throw new UnauthorizedException(
-        'Bạn không có quyền chỉnh sửa bài viết của người khác!',
-      );
-    }
+    await this.findPostAndVerifyOwnership(postId, userId);
 
     await this.prisma.$transaction([
-      this.prisma.like.deleteMany({
-        where: { postId: postId },
-      }),
-
-      this.prisma.comment.deleteMany({ where: { postId: postId } }),
-
-      this.prisma.post.delete({
-        where: { id: postId },
-      }),
+      this.prisma.like.deleteMany({ where: { postId } }),
+      this.prisma.comment.deleteMany({ where: { postId } }),
+      this.prisma.post.delete({ where: { id: postId } }),
     ]);
 
     return true;

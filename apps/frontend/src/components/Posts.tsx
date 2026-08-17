@@ -1,6 +1,7 @@
 import { Post } from "@/lib/types/modelTypes";
 import PostCard from "@/components/postCard";
 import Pagination from "./pagination";
+import HomeFilterBar from "./HomeFilterBar";
 
 type Props = {
   posts: Post[];

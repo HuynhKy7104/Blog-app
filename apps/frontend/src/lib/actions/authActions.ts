@@ -5,7 +5,7 @@ import { SignInSchema, SignUpSchema } from "../schemas/auth.schema";
 import { fetchGraphQL } from "../fetchGraphQL";
 import { CREATE_USER_MUTATION, SIGN_IN } from "../gqlQueries";
 import { print } from "graphql";
-import { createSession, deleteSession } from "../sessions";
+import { createSession, deleteSession, SessionPayload } from "../sessions";
 import { redirect } from "next/navigation";
 
 export const signInAction = async (
@@ -146,6 +146,6 @@ export async function logoutAction(callbackUrl: string = "/") {
   await deleteSession(callbackUrl);
 }
 
-export async function setupGoogleSessionAction(payload: any) {
+export async function setupGoogleSessionAction(payload: SessionPayload) {
   await createSession(payload);
 }
