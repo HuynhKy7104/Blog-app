@@ -120,6 +120,7 @@ type Query {
   postCount: Int!
   posts(input: GetPostsInput): UserPostsResult!
   tags: [Tag!]!
+  users: [User!]!
 }
 
 """Vai trò của người dùng"""

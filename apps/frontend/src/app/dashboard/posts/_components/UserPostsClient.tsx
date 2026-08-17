@@ -9,8 +9,8 @@ import UserPostsDesktop from "./UserPostsDesktop";
 import EditPostModal from "./EditPostModal";
 import DeletePostModal from "./DeletePostModal";
 import { Post } from "@/lib/types/modelTypes";
-import PostSearchBar from "@/components/PostSearchBar";
-import PostFilterBar from "@/components/PostFilterBar";
+import PostSearchBar from "@/components/filter/PostSearchBar";
+import PostFilterBar from "@/components/filter/UserPostFilterBar";
 import { DEFAULT_POSTS_SIZE } from "@/lib/constants";
 
 export default function UserPostsClient() {

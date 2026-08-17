@@ -21,7 +21,6 @@ export class PostService {
     // Gọi hàm dùng chung, nhưng BẮT BUỘC gán isPublished: true
     const { where, orderBy } = this.buildPostQueryOptions({
       ...filters,
-      isPublished: true,
     });
 
     const [posts, totalCount] = await Promise.all([

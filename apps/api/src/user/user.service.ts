@@ -37,4 +37,20 @@ export class UserService {
       data,
     });
   }
+
+  async getUsers() {
+    return await this.prisma.user.findMany({
+      where: {
+        posts: {
+          some: {
+            published: true,
+          },
+        },
+      },
+
+      orderBy: {
+        name: 'asc',
+      },
+    });
+  }
 }

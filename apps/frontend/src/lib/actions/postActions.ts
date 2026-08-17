@@ -25,6 +25,7 @@ export type FetchPostsParams = {
   startDate?: string;
   endDate?: string;
   tagIds?: number[];
+  authorId?: number;
 };
 
 // 2. HÀM TIỆN ÍCH DÙNG CHUNG: Lắp ráp biến input cho GraphQL
@@ -50,6 +51,7 @@ const buildPostQueryInput = (params: FetchPostsParams) => {
     ...(startDate && { startDate }),
     ...(endDate && { endDate }),
     ...(tagIds && tagIds.length > 0 && { tagIds }),
+    ...(params.authorId && { authorId: params.authorId }),
   };
 };
 

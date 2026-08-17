@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/sessions";
 import Link from "next/link";
+import AuthButtons from "../AuthButtons";
 import ProfileDropdown from "./ProfileDropdown";
-import AuthButtons from "./AuthButtons";
 
 type Props = {};
 

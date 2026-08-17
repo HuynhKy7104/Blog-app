@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NavbarContainer from "@/components/NavbarContainer";
-import Navbar from "@/components/navbar";
+import NavbarContainer from "@/components/navbar/NavbarContainer";
 import Providers from "@/app/Providers";
 import { Toaster } from "react-hot-toast";
+import Navbar from "@/components/navbar/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

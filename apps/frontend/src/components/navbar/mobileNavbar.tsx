@@ -1,6 +1,7 @@
 import { PropsWithChildren } from "react";
-import Sidebar from "./ui/SideBar";
+
 import { Bars3Icon } from "@heroicons/react/16/solid";
+import Sidebar from "../ui/SideBar";
 
 type Props = PropsWithChildren;
 

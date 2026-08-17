@@ -158,3 +158,12 @@ export const GET_TAGS = gql`
     }
   }
 `;
+
+export const GET_USERS = gql`
+  query {
+    users {
+      id
+      name
+    }
+  }
+`;
