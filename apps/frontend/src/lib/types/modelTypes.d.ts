@@ -63,10 +63,3 @@ export type FetchPostsParams = {
   tagIds?: number[];
   authorId?: number;
 };
-
-export type PostFormProps = {
-  initialData?: Partial<Post>;
-  state: FormState;
-  isPending: boolean;
-  submitLabel?: string;
-};

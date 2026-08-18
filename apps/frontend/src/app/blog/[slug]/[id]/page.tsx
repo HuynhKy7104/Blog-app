@@ -5,6 +5,7 @@ import CommentSection from "./_components/comments";
 import { getSession } from "@/lib/sessions";
 import Likes from "./_components/likes";
 import { Tag } from "@/lib/types/modelTypes";
+import ViewTracker from "./_components/ViewTracker";
 
 type PostPageProps = {
   params: Promise<{
@@ -39,6 +40,8 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
   return (
     <main className="relative min-h-screen">
+      <ViewTracker postId={post.id} />
+
       <article className="relative max-w-3xl mx-auto pt-32 pb-12 px-4 sm:px-6">
         <header className="mb-10">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-primary-950 leading-tight mb-6">

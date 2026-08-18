@@ -125,4 +125,11 @@ export class PostResolver {
       userId: user.id,
     });
   }
+
+  @Mutation(() => Post, { name: 'incrementViewCount' })
+  async incrementViewCount(
+    @Args('postId', { type: () => Int }) postId: number,
+  ) {
+    return this.postService.incrementViewCount(postId);
+  }
 }

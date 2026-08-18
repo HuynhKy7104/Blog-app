@@ -198,3 +198,12 @@ export const LOGOUT_MUTATION = `
     logout(userId: $userId)
   }
 `;
+
+export const INCREMENT_POST_VIEW_MUTATION = `
+  mutation IncrementPostView($postId: Int!) {
+    incrementViewCount(postId: $postId) {
+      id
+      views
+    }
+  }
+`;

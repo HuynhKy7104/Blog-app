@@ -11,10 +11,10 @@ const publicLinks = [
   { label: "Liên hệ", href: "/contact" },
 ];
 
-const authLinks = [
-  { label: "Đăng nhập ", href: "/auth/signIn" },
-  { label: "Đăng ký", href: "/auth/signUp" },
-];
+// const authLinks = [
+//   { label: "Đăng nhập ", href: "/auth/signIn" },
+//   { label: "Đăng ký", href: "/auth/signUp" },
+// ];
 
 const Navbar = async (props: Props) => {
   const session = await getSession();

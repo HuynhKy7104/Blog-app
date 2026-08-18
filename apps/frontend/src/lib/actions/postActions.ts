@@ -9,6 +9,7 @@ import {
   GET_POST_BY_ID,
   GET_POSTS,
   GET_USER_POSTS,
+  INCREMENT_POST_VIEW_MUTATION,
   LIKE_POST_MUTATION,
   UPDATE_POST_MUTATION,
 } from "../gqlQueries";
@@ -264,3 +265,14 @@ export const deleteUserPost = async (postId: number) => {
 
   return true;
 };
+
+export async function incrementPostViewAction(postId: number) {
+  try {
+    await fetchGraphQL(INCREMENT_POST_VIEW_MUTATION, { postId });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Lỗi khi đếm lượt xem:", error);
+    return { success: false };
+  }
+}

@@ -237,4 +237,15 @@ export class PostService {
     // Trả về cả hai đối tượng để hàm cha sử dụng
     return { where, orderBy };
   }
+
+  async incrementViewCount(postId: number) {
+    return this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        views: {
+          increment: 1, // Kỹ thuật tuyệt vời của Prisma: Tự động cộng 1 vào giá trị hiện tại
+        },
+      },
+    });
+  }
 }
