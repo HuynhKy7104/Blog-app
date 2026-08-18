@@ -15,8 +15,8 @@ import { logoutAction } from "@/lib/actions/authActions";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { label: "📝 Tạo bài viết mới", href: "/posts/create" },
-  { label: "📚 Danh sách bài viết", href: "/dashboard/posts" },
+  { label: "📝 Tạo bài viết mới", href: "/post/create" },
+  { label: "📚 Danh sách bài viết", href: "/post/dashboard" },
 ];
 
 type Props = {

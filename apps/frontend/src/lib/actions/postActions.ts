@@ -3,6 +3,7 @@
 import { print } from "graphql";
 import { fetchGraphQL } from "../fetchGraphQL";
 import {
+  CREATE_POST_MUTATION,
   DELETE_POST_MUTATION,
   GET_POST_BY_ID,
   GET_POSTS,
@@ -10,7 +11,7 @@ import {
   LIKE_POST_MUTATION,
   UPDATE_POST_MUTATION,
 } from "../gqlQueries";
-import { Post } from "../types/modelTypes";
+import { Post, PostInputData } from "../types/modelTypes";
 import { transformTakeSkip } from "../helpers";
 import { getSession } from "../sessions";
 import { DEFAULT_PAGE_SIZE, DEFAULT_POSTS_SIZE } from "../constants";
@@ -136,16 +137,44 @@ export const fetchUserPosts = async (params: FetchPostsParams) => {
   };
 };
 
-export const updateUserPost = async (
-  postId: number,
-  updateData: {
-    title?: string;
-    content?: string;
-    thumbnail?: string;
-    published?: boolean;
-    tagIds?: number[];
-  },
-) => {
+export const createUserPost = async (createData: PostInputData) => {
+  const session = await getSession();
+
+  if (!session?.accessToken) {
+    throw new Error("Bạn chưa đăng nhập!");
+  }
+
+  const result = await fetchGraphQL(
+    print(CREATE_POST_MUTATION),
+    {
+      createData,
+    },
+    {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  );
+
+  if (result.errors || !result.data) {
+    console.error(
+      "=== LỖI TẠO BÀI VIẾT ===",
+      JSON.stringify(result.errors, null, 2),
+    );
+
+    const originalError = result.errors[0]?.extensions?.originalError;
+    if (originalError && Array.isArray(originalError.message)) {
+      throw new Error(originalError.message[0]);
+    }
+
+    throw new Error(
+      result.errors[0]?.message ||
+        "Không thể tạo bài viết lúc này. Vui lòng kiểm tra lại.",
+    );
+  }
+
+  return result.data.createUserPost;
+};
+
+export const updateUserPost = async (postId: number, updateData: PostInputData) => {
   const session = await getSession();
 
   if (!session?.accessToken) {

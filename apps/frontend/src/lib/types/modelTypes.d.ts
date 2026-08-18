@@ -43,3 +43,11 @@ export type CommentEntity = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type PostInputData = {
+  title?: string;
+  content?: string;
+  thumbnail?: string;
+  published?: boolean;
+  tagIds?: number[];
+};

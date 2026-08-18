@@ -19,6 +19,7 @@ import { GetUserPostsInput } from './dto/get-user-posts.input';
 import { UserPostsResult } from './entities/user-posts-result.entity';
 import { CommentService } from '../comment/comment.service';
 import { GetPostsInput } from './dto/get-posts.input';
+import { CreatePostInput } from './dto/create-post.input';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -83,6 +84,19 @@ export class PostResolver {
     input: GetUserPostsInput = new GetUserPostsInput(),
   ) {
     return this.postService.getUserPosts(user.id, input);
+  }
+
+  @Mutation(() => Post)
+  @UseGuards(JwtAuthGuard)
+  async createUserPost(
+    @CurrentUser() user: AuthUser,
+    @Args('createData')
+    createData: CreatePostInput,
+  ) {
+    return this.postService.createUserPost({
+      userId: user.id,
+      createData,
+    });
   }
 
   @Mutation(() => Post)

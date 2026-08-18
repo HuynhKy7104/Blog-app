@@ -131,6 +131,19 @@ export const GET_USER_POSTS = gql`
   }
 `;
 
+export const CREATE_POST_MUTATION = gql`
+  mutation CreateUserPost($createData: CreatePostInput!) {
+    createUserPost(createData: $createData) {
+      id
+      title
+      content
+      thumbnail
+      published
+      updatedAt
+    }
+  }
+`;
+
 export const UPDATE_POST_MUTATION = gql`
   mutation UpdateUserPost($postId: Int!, $updateData: UpdatePostInput!) {
     updateUserPost(postId: $postId, updateData: $updateData) {

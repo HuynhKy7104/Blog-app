@@ -27,6 +27,15 @@ type Comment {
   updatedAt: DateTime!
 }
 
+input CreatePostInput {
+  content: String!
+  published: Boolean = false
+  slug: String
+  tagIds: [Int!]
+  thumbnail: String
+  title: String!
+}
+
 input CreateUserInput {
   avatar: String
   bio: String
@@ -76,6 +85,7 @@ type Mutation {
   CreateUser(signUpInput: SignUpInput!): Auth!
   createPostComment(content: String!, postId: Int!): Comment!
   createUser(createUserInput: CreateUserInput!): User!
+  createUserPost(createData: CreatePostInput!): Post!
   deleteUserPost(postId: Int!): Boolean!
   likePost(postId: Int!): Boolean!
   signIn(signInInput: SignInInput!): AuthPayload!

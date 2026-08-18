@@ -10,6 +10,7 @@ import { PostSortBy } from './dto/post-sort-by.enum';
 import { Prisma } from '../generated/prisma/client';
 import { GetUserPostsInput } from './dto/get-user-posts.input';
 import { GetPostsInput } from './dto/get-posts.input';
+import { CreatePostInput } from './dto/create-post.input';
 
 @Injectable()
 export class PostService {
@@ -99,6 +100,38 @@ export class PostService {
     }
 
     return post;
+  }
+
+  async createUserPost({
+    userId,
+    createData,
+  }: {
+    userId: number;
+    createData: CreatePostInput;
+  }) {
+    const { tagIds, ...rest } = createData;
+
+    return this.prisma.post.create({
+      data: {
+        // 1. Trải các dữ liệu cơ bản (title, content, thumbnail, slug...)
+        ...rest,
+
+        // 2. GIẢI QUYẾT LỖI THIẾU AUTHOR:
+        // Báo cho Prisma biết bài viết này thuộc về user nào bằng cách 'connect'
+        author: {
+          connect: { id: userId },
+        },
+
+        // 3. Gắn thể loại (tags) nếu người dùng có chọn
+        // Khi tạo mới, dùng 'connect' thay vì 'set'
+        ...(tagIds &&
+          tagIds.length > 0 && {
+            tags: {
+              connect: tagIds.map((id) => ({ id })),
+            },
+          }),
+      },
+    });
   }
 
   async updateUserPost({
