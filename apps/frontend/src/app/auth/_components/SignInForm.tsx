@@ -40,7 +40,8 @@ export default function SignInForm() {
         value={callbackUrl}
       />
 
-      {state?.message && !state.success && (
+      {/* Hiển thị lỗi chung của hệ thống */}
+      {state?.message && !state?.success && (
         <div className="p-3 rounded-md text-sm font-medium bg-red-100 text-red-700">
           {state.message}
         </div>
@@ -54,6 +55,10 @@ export default function SignInForm() {
           type="email"
           placeholder="you@example.com"
         />
+        {/* ĐÃ SỬA: Thêm khối này để hiển thị lỗi Zod cho trường Email */}
+        {state?.errors?.email && (
+          <p className="text-sm text-red-500 font-medium">{state.errors.email[0]}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -64,6 +69,12 @@ export default function SignInForm() {
           type="password"
           placeholder="••••••••"
         />
+        {/* ĐÃ SỬA: Thêm khối này để hiển thị lỗi Zod cho trường Password */}
+        {state?.errors?.password && (
+          <p className="text-sm text-red-500 font-medium">
+            {state.errors.password[0]}
+          </p>
+        )}
       </div>
 
       <div className="pt-2">
@@ -91,7 +102,6 @@ export default function SignInForm() {
         onClick={handleGoogleLogin}
         className="w-full flex items-center justify-center gap-3 bg-white text-gray-700 border border-gray-300 font-bold py-2.5 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
       >
-        {/* Biểu tượng SVG Google chuẩn */}
         <svg
           className="w-5 h-5"
           viewBox="0 0 24 24"

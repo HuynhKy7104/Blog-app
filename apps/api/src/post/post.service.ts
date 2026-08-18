@@ -11,6 +11,7 @@ import { Prisma } from '../generated/prisma/client';
 import { GetUserPostsInput } from './dto/get-user-posts.input';
 import { GetPostsInput } from './dto/get-posts.input';
 import { CreatePostInput } from './dto/create-post.input';
+import { generateSlug } from '../utils';
 
 @Injectable()
 export class PostService {
@@ -109,21 +110,20 @@ export class PostService {
     userId: number;
     createData: CreatePostInput;
   }) {
-    const { tagIds, ...rest } = createData;
+    const { tagIds, slug, ...rest } = createData;
+
+    const finalSlug = slug ? slug : generateSlug(createData.title);
 
     return this.prisma.post.create({
       data: {
-        // 1. Trải các dữ liệu cơ bản (title, content, thumbnail, slug...)
         ...rest,
 
-        // 2. GIẢI QUYẾT LỖI THIẾU AUTHOR:
-        // Báo cho Prisma biết bài viết này thuộc về user nào bằng cách 'connect'
+        slug: finalSlug,
+
         author: {
           connect: { id: userId },
         },
 
-        // 3. Gắn thể loại (tags) nếu người dùng có chọn
-        // Khi tạo mới, dùng 'connect' thay vì 'set'
         ...(tagIds &&
           tagIds.length > 0 && {
             tags: {
@@ -145,12 +145,20 @@ export class PostService {
   }) {
     await this.findPostAndVerifyOwnership(postId, userId);
 
-    const { tagIds, ...rest } = updateData;
+    const { tagIds, slug, title, ...rest } = updateData;
+
+    let finalSlug = slug;
+    if (!finalSlug && title) {
+      finalSlug = generateSlug(title);
+    }
 
     return this.prisma.post.update({
       where: { id: postId },
       data: {
         ...rest,
+        ...(title && { title }),
+        ...(finalSlug && { slug: finalSlug }),
+
         ...(tagIds !== undefined && {
           tags: { set: tagIds.map((id) => ({ id })) },
         }),

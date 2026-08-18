@@ -1,5 +1,6 @@
 "use server";
 
+import { FormState } from "../types/formState";
 import { print } from "graphql";
 import { fetchGraphQL } from "../fetchGraphQL";
 import {
@@ -11,38 +12,33 @@ import {
   LIKE_POST_MUTATION,
   UPDATE_POST_MUTATION,
 } from "../gqlQueries";
-import { Post, PostInputData } from "../types/modelTypes";
+import { FetchPostsParams, Post } from "../types/modelTypes";
 import { transformTakeSkip } from "../helpers";
 import { getSession } from "../sessions";
 import { DEFAULT_PAGE_SIZE, DEFAULT_POSTS_SIZE } from "../constants";
+import { CreatePostSchema, UpdatePostSchema } from "../schemas/post.schemas";
 
-// 1. TẠO KIỂU DỮ LIỆU CHUNG
-export type FetchPostsParams = {
-  page: number;
-  pageSize?: number;
-  search?: string;
-  status?: string;
-  sortBy?: string;
-  startDate?: string;
-  endDate?: string;
-  tagIds?: number[];
-  authorId?: number;
+const extractPostFormData = (formData: FormData) => {
+  return {
+    title: formData.get("title")?.toString() || "",
+    content: formData.get("content")?.toString() || "",
+    thumbnail: formData.get("thumbnail")?.toString() || "",
+    published: formData.get("published") === "on",
+    slug: formData.get("slug")?.toString() || "",
+    tagIds: formData.getAll("tagIds").map((id) => Number(id)),
+  };
 };
 
-// 2. HÀM TIỆN ÍCH DÙNG CHUNG: Lắp ráp biến input cho GraphQL
 const buildPostQueryInput = (params: FetchPostsParams) => {
   const { page, pageSize, search, status, sortBy, startDate, endDate, tagIds } =
     params;
 
-  // Tính toán phân trang
   const { skip, take } = transformTakeSkip({ page, pageSize });
 
-  // Xử lý trạng thái xuất bản
   let isPublished = undefined;
   if (status === "PUBLISHED") isPublished = true;
   if (status === "DRAFT") isPublished = false;
 
-  // Trả về object input hoàn chỉnh
   return {
     skip,
     take,
@@ -137,80 +133,110 @@ export const fetchUserPosts = async (params: FetchPostsParams) => {
   };
 };
 
-export const createUserPost = async (createData: PostInputData) => {
-  const session = await getSession();
+export const createPostAction = async (
+  _prevData: FormState,
+  formData: FormData,
+): Promise<FormState> => {
+  const rawData = extractPostFormData(formData);
 
-  if (!session?.accessToken) {
-    throw new Error("Bạn chưa đăng nhập!");
+  const validatedFields = CreatePostSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: "Vui lòng kiểm tra lại thông tin bài viết.",
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
   }
 
-  const result = await fetchGraphQL(
-    print(CREATE_POST_MUTATION),
-    {
-      createData,
-    },
-    {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  );
+  const session = await getSession();
+  if (!session?.accessToken) {
+    return { success: false, message: "Bạn chưa đăng nhập!", errors: {} };
+  }
 
-  if (result.errors || !result.data) {
-    console.error(
-      "=== LỖI TẠO BÀI VIẾT ===",
-      JSON.stringify(result.errors, null, 2),
+  try {
+    const result = await fetchGraphQL(
+      print(CREATE_POST_MUTATION),
+      {
+        createData: validatedFields.data,
+      },
+      {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
     );
 
-    const originalError = result.errors[0]?.extensions?.originalError;
-    if (originalError && Array.isArray(originalError.message)) {
-      throw new Error(originalError.message[0]);
+    if (result.errors && result.errors.length > 0) {
+      const errorMessage = result.errors[0]?.message || "Lỗi từ máy chủ.";
+      return { success: false, message: errorMessage, errors: {} };
     }
 
-    throw new Error(
-      result.errors[0]?.message ||
-        "Không thể tạo bài viết lúc này. Vui lòng kiểm tra lại.",
-    );
+    return {
+      success: true,
+      message: "Tạo bài viết thành công!",
+      errors: {},
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Đã có lỗi xảy ra.",
+      errors: {},
+    };
   }
-
-  return result.data.createUserPost;
 };
 
-export const updateUserPost = async (postId: number, updateData: PostInputData) => {
-  const session = await getSession();
+export const updatePostAction = async (
+  _prevData: FormState,
+  formData: FormData,
+): Promise<FormState> => {
+  const rawPostId = formData.get("postId")?.toString();
+  const postId = rawPostId ? parseInt(rawPostId, 10) : 0;
 
-  if (!session?.accessToken) {
-    throw new Error("Bạn chưa đăng nhập!");
+  if (!postId) {
+    return { success: false, message: "Không tìm thấy ID bài viết.", errors: {} };
   }
 
-  const result = await fetchGraphQL(
-    print(UPDATE_POST_MUTATION),
-    {
-      postId,
-      updateData,
-    },
-    {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  );
+  const rawData = extractPostFormData(formData);
 
-  if (result.errors || !result.data) {
-    console.error(
-      "=== LỖI CẬP NHẬT BÀI VIẾT ===",
-      JSON.stringify(result.errors, null, 2),
+  const validatedFields = UpdatePostSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: "Vui lòng kiểm tra lại thông tin bài viết.",
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const session = await getSession();
+  if (!session?.accessToken) {
+    return { success: false, message: "Bạn chưa đăng nhập!", errors: {} };
+  }
+
+  try {
+    const result = await fetchGraphQL(
+      print(UPDATE_POST_MUTATION),
+      {
+        postId,
+        updateData: validatedFields.data,
+      },
+      {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
     );
 
-    const originalError = result.errors[0]?.extensions?.originalError;
-
-    if (originalError && Array.isArray(originalError.message)) {
-      throw new Error(originalError.message[0]);
+    if (result.errors && result.errors.length > 0) {
+      const errorMessage = result.errors[0]?.message || "Lỗi từ máy chủ.";
+      return { success: false, message: errorMessage, errors: {} };
     }
 
-    throw new Error(
-      result.errors[0]?.message ||
-        "Không thể cập nhật bài viết lúc này. Vui lòng kiểm tra lại.",
-    );
+    return { success: true, message: "Cập nhật bài viết thành công!", errors: {} };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Đã có lỗi xảy ra.",
+      errors: {},
+    };
   }
-
-  return result.data.updateUserPost;
 };
 
 export const deleteUserPost = async (postId: number) => {

@@ -1,5 +1,3 @@
-// Không còn "use client" ở đây nữa! Trang này là Server Component.
-
 import CreatePostClient from "./_components/CreatePostClient";
 
 export default function CreatePostPage() {

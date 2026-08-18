@@ -121,6 +121,7 @@ export const GET_USER_POSTS = gql`
         content
         updatedAt
         views
+        slug
         tags {
           id
           name
@@ -140,6 +141,7 @@ export const CREATE_POST_MUTATION = gql`
       thumbnail
       published
       updatedAt
+      slug
     }
   }
 `;
@@ -153,6 +155,7 @@ export const UPDATE_POST_MUTATION = gql`
       thumbnail
       published
       updatedAt
+      slug
     }
   }
 `;

@@ -44,10 +44,29 @@ export type CommentEntity = {
   updatedAt: Date;
 };
 
-export type PostInputData = {
-  title?: string;
-  content?: string;
-  thumbnail?: string;
-  published?: boolean;
+// export type PostInputData = {
+//   title?: string;
+//   content?: string;
+//   thumbnail?: string;
+//   published?: boolean;
+//   tagIds?: number[];
+// };
+
+export type FetchPostsParams = {
+  page: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+  sortBy?: string;
+  startDate?: string;
+  endDate?: string;
   tagIds?: number[];
+  authorId?: number;
+};
+
+export type PostFormProps = {
+  initialData?: Partial<Post>;
+  state: FormState;
+  isPending: boolean;
+  submitLabel?: string;
 };
