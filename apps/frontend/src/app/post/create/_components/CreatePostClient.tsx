@@ -16,7 +16,7 @@ export default function CreatePostClient() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userPosts"] });
       alert("Tạo bài viết thành công!");
-      router.push("/"); // Trở về trang chủ
+      router.push("/post/dashboard");
     },
   });
 

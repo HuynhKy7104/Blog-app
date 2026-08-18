@@ -88,6 +88,8 @@ type Mutation {
   createUserPost(createData: CreatePostInput!): Post!
   deleteUserPost(postId: Int!): Boolean!
   likePost(postId: Int!): Boolean!
+  logout(userId: Int!): Boolean!
+  refreshToken(token: String!): AuthPayload!
   signIn(signInInput: SignInInput!): AuthPayload!
   updateUser(id: Int!, updateUserInput: UpdateUserInput!): User!
   updateUserPost(postId: Int!, updateData: UpdatePostInput!): Post!

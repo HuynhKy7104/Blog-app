@@ -3,10 +3,21 @@
 import { FormState } from "../types/formState";
 import { SignInSchema, SignUpSchema } from "../schemas/auth.schema";
 import { fetchGraphQL } from "../fetchGraphQL";
-import { CREATE_USER_MUTATION, SIGN_IN } from "../gqlQueries";
+import {
+  CREATE_USER_MUTATION,
+  LOGOUT_MUTATION,
+  REFRESH_TOKEN_MUTATION,
+  SIGN_IN,
+} from "../gqlQueries";
 import { print } from "graphql";
-import { createSession, deleteSession, SessionPayload } from "../sessions";
+import {
+  createSession,
+  deleteSession,
+  getSession,
+  SessionPayload,
+} from "../sessions";
 import { redirect } from "next/navigation";
+import { BACKEND_URL } from "../constants";
 
 export const signInAction = async (
   _prevData: FormState,
@@ -142,10 +153,67 @@ export const signUpAction = async (
   redirect(`/auth/signIn?callbackUrl=${encodedCallback}`);
 };
 
-export async function logoutAction(callbackUrl: string = "/") {
-  await deleteSession(callbackUrl);
-}
+export const logoutAction = async (callbackUrl: string = "/") => {
+  try {
+    const session = await getSession();
+
+    if (session && session.user.id) {
+      await fetch(`${BACKEND_URL}/graphql`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: LOGOUT_MUTATION,
+          variables: { userId: session.user.id },
+        }),
+      });
+    }
+  } catch (error) {
+    console.error("Lỗi khi gọi API đăng xuất:", error);
+  } finally {
+    await deleteSession(callbackUrl);
+  }
+};
 
 export async function setupGoogleSessionAction(payload: SessionPayload) {
   await createSession(payload);
 }
+
+export const refreshAccessToken = async () => {
+  try {
+    const session = await getSession();
+
+    if (!session || !session.refreshToken) {
+      return null;
+    }
+
+    const response = await fetch(`${BACKEND_URL}/graphql`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: print(REFRESH_TOKEN_MUTATION),
+        variables: { token: session.refreshToken },
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.errors || !result.data?.refreshToken) {
+      return null;
+    }
+
+    const { accessToken, refreshToken } = result.data.refreshToken;
+
+    const updatedPayload = {
+      ...session,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    };
+
+    await createSession(updatedPayload);
+
+    return accessToken;
+  } catch (error) {
+    console.error("=== LỖI KHI LÀM MỚI TOKEN TỪ SESSION ===", error);
+    return null;
+  }
+};

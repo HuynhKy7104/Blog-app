@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Int } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { SignInInput } from './dto/signin.input';
 import { AuthPayload } from './entities/auth-payload.entity';
@@ -21,5 +21,15 @@ export class AuthResolver {
     const user = await this.authService.signup(signUpInput);
 
     return user;
+  }
+
+  @Mutation(() => AuthPayload)
+  async refreshToken(@Args('token') token: string) {
+    return await this.authService.refreshToken(token);
+  }
+
+  @Mutation(() => Boolean)
+  async logout(@Args('userId', { type: () => Int }) userId: number) {
+    return await this.authService.logout(userId);
   }
 }

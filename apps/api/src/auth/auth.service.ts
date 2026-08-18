@@ -64,6 +64,9 @@ export class AuthService {
 
   async login(user: User) {
     const { accessToken, refreshToken } = await this.generateToken(user.id);
+
+    await this.updateRtHash(user.id, refreshToken);
+
     return {
       id: user.id,
       name: user.name,
@@ -126,5 +129,72 @@ export class AuthService {
         password: googleUser.password || '',
       },
     });
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const decoded = await this.jwtService.verifyAsync<AuthJwtPayload>(
+        refreshToken,
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        },
+      );
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.sub },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('Không tìm thấy người dùng!');
+      }
+
+      if (!user.hashedRefreshToken) {
+        throw new UnauthorizedException('Truy cập bị từ chối!');
+      }
+
+      const rtMatches = await verify(user.hashedRefreshToken, refreshToken);
+      if (!rtMatches) {
+        throw new UnauthorizedException(
+          'Token không khớp hoặc đã bị đánh cắp!',
+        );
+      }
+
+      const tokens = await this.generateToken(user.id);
+      await this.updateRtHash(user.id, tokens.refreshToken);
+
+      return {
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new UnauthorizedException(
+        'Refresh token không hợp lệ hoặc đã hết hạn.',
+      );
+    }
+  }
+
+  async updateRtHash(userId: number, rt: string) {
+    const hashRt = await hash(rt);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { hashedRefreshToken: hashRt },
+    });
+  }
+
+  async logout(userId: number) {
+    await this.prisma.user.updateMany({
+      where: {
+        id: userId,
+        hashedRefreshToken: { not: null },
+      },
+      data: {
+        hashedRefreshToken: null,
+      },
+    });
+    return true;
   }
 }

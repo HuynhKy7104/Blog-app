@@ -180,3 +180,18 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+export const REFRESH_TOKEN_MUTATION = gql`
+  mutation RefreshToken($token: String!) {
+    refreshToken(token: $token) {
+      accessToken
+      refreshToken
+    }
+  }
+`;
+
+export const LOGOUT_MUTATION = `
+  mutation Logout($userId: Int!) {
+    logout(userId: $userId)
+  }
+`;
