@@ -8,11 +8,6 @@ export const fetchAllTags = async () => {
   try {
     const result = await fetchGraphQL(print(GET_TAGS), {});
 
-    console.log(
-      "=== KẾT QUẢ GỐC TỪ API GRAPHQL ===",
-      JSON.stringify(result, null, 2),
-    );
-
     if (result.errors) {
       console.error("Lỗi từ GraphQL:", result.errors);
       throw new Error(result.errors[0]?.message || "Lỗi khi lấy danh sách thể loại");

@@ -5,6 +5,7 @@ import { updateUserPost } from "@/lib/actions/postActions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Post } from "@/lib/types/modelTypes";
 import { fetchAllTags } from "@/lib/actions/tagActions";
+import { uploadThumbnailAction } from "@/lib/upload";
 
 type EditPostModalProps = {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export default function EditPostModal({
   const [content, setContent] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [published, setPublished] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -164,13 +166,31 @@ export default function EditPostModal({
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => {
+                      disabled={isUploading}
+                      onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          alert(
-                            `Bạn vừa chọn tệp: ${file.name}. Hiện tại tôi chưa tìm được cách tối ưu nếu gửi ảnh từ máy. Sorry sir, sau này sẽ cập nhật`,
-                          );
-                          // Logic tương lai: await uploadFileToBackend(file);
+                          try {
+                            setIsUploading(true);
+
+                            // 1. Tạo FormData và đưa tệp ảnh vào
+                            const formData = new FormData();
+                            formData.append("image", file);
+
+                            // 2. Gọi Server Action thay vì hàm Client cũ
+                            const uploadedUrl =
+                              await uploadThumbnailAction(formData);
+
+                            setThumbnail(uploadedUrl);
+                          } catch (err) {
+                            console.error("Lỗi upload:", err);
+                            alert(
+                              "Đã có lỗi xảy ra khi tải ảnh lên. Vui lòng thử lại!",
+                            );
+                          } finally {
+                            setIsUploading(false);
+                            e.target.value = "";
+                          }
                         }
                       }}
                     />
