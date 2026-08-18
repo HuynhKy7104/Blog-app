@@ -1,12 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation"; // 1. Import thêm useSearchParams
 
 export default function AuthButtons() {
   const pathname = usePathname();
+  const searchParams = useSearchParams(); // 2. Lấy các tham số trên thanh địa chỉ (URL query)
 
-  const encodedCallback = encodeURIComponent(pathname);
+  const isAuthPage = pathname.startsWith("/auth");
+
+  const targetUrl = isAuthPage ? searchParams.get("callbackUrl") || "/" : pathname;
+
+  const encodedCallback = encodeURIComponent(targetUrl);
 
   return (
     <>

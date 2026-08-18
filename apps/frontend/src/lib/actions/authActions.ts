@@ -149,8 +149,11 @@ export const signUpAction = async (
     };
   }
 
-  const encodedCallback = encodeURIComponent(callbackUrl);
-  redirect(`/auth/signIn?callbackUrl=${encodedCallback}`);
+  return {
+    success: true,
+    message: "Đăng ký thành công! Đang chuyển hướng sang trang đăng nhập...",
+    errors: {},
+  };
 };
 
 export const logoutAction = async (callbackUrl: string = "/") => {
