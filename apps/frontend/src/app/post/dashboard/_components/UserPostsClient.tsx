@@ -12,6 +12,7 @@ import { Post } from "@/lib/types/modelTypes";
 import PostSearchBar from "@/components/filter/PostSearchBar";
 import PostFilterBar from "@/components/filter/UserPostFilterBar";
 import { DEFAULT_POSTS_SIZE } from "@/lib/constants";
+import Link from "next/link";
 
 export default function UserPostsClient() {
   const [page, setPage] = useState(1);
@@ -101,9 +102,12 @@ export default function UserPostsClient() {
             </div>
 
             {/* Thêm w-full sm:w-auto để nút bấm rộng hết cỡ trên điện thoại */}
-            <button className="w-full sm:w-auto shrink-0 h-10 px-5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex justify-center items-center font-medium shadow-sm whitespace-nowrap">
+            <Link
+              href="/post/create"
+              className="w-full sm:w-auto shrink-0 h-10 px-5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex justify-center items-center font-medium shadow-sm whitespace-nowrap"
+            >
               + Viết bài mới
-            </button>
+            </Link>
           </div>
         </div>
 
