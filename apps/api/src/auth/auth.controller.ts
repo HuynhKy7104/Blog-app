@@ -37,6 +37,7 @@ export class AuthController {
       avatar: user.avatar ?? '',
     });
 
-    res.redirect(`http://localhost:3000/auth/success?${params.toString()}`);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(`${frontendUrl}/auth/success?${params.toString()}`);
   }
 }
