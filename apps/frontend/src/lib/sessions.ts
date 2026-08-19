@@ -14,7 +14,7 @@ export type SessionPayload = {
   refreshToken: string;
 };
 
-const secretKey = process.env.SESSION_SERET_KEY!;
+const secretKey = process.env.SESSION_SECRET_KEY!;
 const encodeKey = new TextEncoder().encode(secretKey);
 
 export async function createSession(payload: SessionPayload) {
