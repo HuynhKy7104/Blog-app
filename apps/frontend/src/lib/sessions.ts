@@ -14,7 +14,12 @@ export type SessionPayload = {
   refreshToken: string;
 };
 
-const secretKey = process.env.SESSION_SECRET_KEY!;
+const secretKey = process.env.SESSION_SECRET_KEY;
+
+if (!secretKey) {
+  throw new Error("SESSION_SECRET_KEY is not defined in environment variables");
+}
+
 const encodeKey = new TextEncoder().encode(secretKey);
 
 export async function createSession(payload: SessionPayload) {
