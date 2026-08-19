@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { DEFAULT_PAGE_SIZE, DEFAULT_POSTS_SIZE } from '../../constants';
 import { UpdatePostInput } from './dto/update-post.input';
 import { PostSortBy } from './dto/post-sort-by.enum';
-import { Prisma } from '../generated/prisma/client';
+import { Prisma } from '@prisma/client';
 import { GetUserPostsInput } from './dto/get-user-posts.input';
 import { GetPostsInput } from './dto/get-posts.input';
 import { CreatePostInput } from './dto/create-post.input';

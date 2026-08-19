@@ -8,7 +8,7 @@ import { SignInInput } from './dto/signin.input';
 import { verify } from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { AuthJwtPayload } from './types/auth.jwtPayload';
-import { User } from '../generated/prisma/client';
+import { User } from '@prisma/client';
 import { hash } from 'argon2';
 import { SignUpInput } from './dto/signup.input';
 import { ConfigService } from '@nestjs/config';
