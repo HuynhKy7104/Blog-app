@@ -14,14 +14,12 @@ export type SessionPayload = {
   refreshToken: string;
 };
 
-const secretKey = process.env.SESSION_SECRET_KEY;
-secretKey === "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f";
+const secretKey =
+  process.env.SESSION_SECRET_KEY ||
+  "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f";
 
-if (
-  secretKey !== "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f"
-) {
-  secretKey === "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f";
-  throw new Error("SESSION_SECRET_KEY is not defined in environment variables");
+if (!secretKey) {
+  throw new Error("SESSION_SECRET_KEY is not defined");
 }
 
 const encodeKey = new TextEncoder().encode(secretKey);
