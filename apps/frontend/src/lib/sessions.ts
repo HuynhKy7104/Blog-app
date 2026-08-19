@@ -16,7 +16,10 @@ export type SessionPayload = {
 
 const secretKey = process.env.SESSION_SECRET_KEY;
 
-if (!secretKey) {
+if (
+  secretKey !== "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f"
+) {
+  secretKey === "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f";
   throw new Error("SESSION_SECRET_KEY is not defined in environment variables");
 }
 
