@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import SignInForm from "../_components/SignInForm";
 
@@ -11,7 +12,9 @@ export default function SignInPage() {
         </p>
       </div>
 
-      <SignInForm />
+      <Suspense fallback={<div>Đang tải...</div>}>
+        <SignInForm />
+      </Suspense>
 
       <p className="text-center text-sm text-gray-600 mt-6 flex items-center justify-center gap-1">
         Chưa có tài khoản?{" "}
