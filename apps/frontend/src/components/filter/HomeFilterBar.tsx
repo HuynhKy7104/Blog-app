@@ -4,6 +4,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import PostSearchBar from "./PostSearchBar";
 import SortSelect from "./SortSelect";
+import { useDebounce } from "@/hooks/useDebounce";
 
 // 1. Định nghĩa kiểu dữ liệu cho danh sách truyền vào
 type FilterItem = {
@@ -30,6 +31,7 @@ export default function HomeFilterBar({
   const initialTagId = searchParams.get("tagId") || "ALL";
 
   const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const debouncedSearch = useDebounce(searchTerm, 500);
 
   const handleFilterChange = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -41,19 +43,19 @@ export default function HomeFilterBar({
   };
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      const params = new URLSearchParams(searchParams);
-      if (searchTerm) params.set("search", searchTerm);
-      else params.delete("search");
+    const params = new URLSearchParams(searchParams);
 
-      if (searchTerm !== initialSearch) {
-        params.set("page", "1");
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-      }
-    }, 500);
+    if (debouncedSearch) {
+      params.set("search", debouncedSearch);
+    } else {
+      params.delete("search");
+    }
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, pathname, router, searchParams, initialSearch]);
+    if (debouncedSearch !== initialSearch) {
+      params.set("page", "1");
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }, [debouncedSearch, pathname, router, searchParams, initialSearch]);
 
   return (
     <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-8">

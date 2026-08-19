@@ -13,32 +13,48 @@ import PostSearchBar from "@/components/filter/PostSearchBar";
 import PostFilterBar from "@/components/filter/UserPostFilterBar";
 import { DEFAULT_POSTS_SIZE } from "@/lib/constants";
 import Link from "next/link";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function UserPostsClient() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const pageSize = DEFAULT_POSTS_SIZE;
 
+  const debouncedSearch = useDebounce(search, 500);
+
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("NEWEST");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const debouncedStartDate = useDebounce(startDate, 500);
+  const debouncedEndDate = useDebounce(endDate, 500);
 
   const [editingPost, setEditingPost] = useState<Post>();
   const [deletingPost, setDeletingPost] = useState<Post>();
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, sortBy, startDate, endDate]);
+  }, [debouncedSearch, statusFilter, sortBy, debouncedStartDate, debouncedEndDate]);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["userPosts", page, search, statusFilter, sortBy, startDate, endDate],
+    queryKey: [
+      "userPosts",
+      page,
+      debouncedSearch,
+      statusFilter,
+      sortBy,
+      debouncedStartDate,
+      debouncedEndDate,
+    ],
     queryFn: () => {
-      const isoStartDate = startDate ? new Date(startDate).toISOString() : undefined;
+      const isoStartDate = debouncedStartDate
+        ? new Date(debouncedStartDate).toISOString()
+        : undefined;
 
       let isoEndDate = undefined;
-      if (endDate) {
-        const end = new Date(endDate);
+      if (debouncedEndDate) {
+        const end = new Date(debouncedEndDate);
         end.setHours(23, 59, 59, 999);
         isoEndDate = end.toISOString();
       }
@@ -46,7 +62,7 @@ export default function UserPostsClient() {
       return fetchUserPosts({
         page,
         pageSize,
-        search,
+        search: debouncedSearch,
         status: statusFilter,
         sortBy,
         startDate: isoStartDate,
