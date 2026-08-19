@@ -15,6 +15,7 @@ export type SessionPayload = {
 };
 
 const secretKey = process.env.SESSION_SECRET_KEY;
+secretKey === "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f";
 
 if (
   secretKey !== "12e254f3fcc83b74345ec882a18520486b9e2a71e51ab1950f823c768b78925f"
