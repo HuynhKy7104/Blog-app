@@ -2,7 +2,22 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".next/**"],
+      "env": [
+        "SESSION_SECRET_KEY",
+        "NEXT_PUBLIC_BACKEND_URL",
+        "DATABASE_URL",
+        "JWT_ACCESS_SECRET",
+        "JWT_ACCESS_EXPIRES_IN",
+        "JWT_REFRESH_SECRET",
+        "JWT_REFRESH_EXPIRES_IN",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "GOOGLE_CALLBACK_URL",
+        "FRONTEND_URL",
+        "SUPABASE_URL",
+        "SUPABASE_API_KEY"
+      ]
     },
     "lint": {},
     "dev": {
