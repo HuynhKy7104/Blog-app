@@ -5,6 +5,7 @@ import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import HomeFilterBar from "@/components/filter/HomeFilterBar";
 import { fetchAllTags } from "@/lib/actions/tagActions";
 import { fetchAllAuthors } from "@/lib/actions/userActions";
+import { Suspense } from "react";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -47,10 +48,12 @@ export default async function Home({ searchParams }: Props) {
       <Hero />
       <section className="container m-8 max-w-5xl mx-auto">
         {/* 2. Truyền danh sách thật vào FilterBar */}
-        <HomeFilterBar
-          tags={tags || []}
-          authors={authors || []}
-        />
+        <Suspense fallback={<div>Đang tải bộ lọc...</div>}>
+          <HomeFilterBar
+            tags={tags}
+            authors={authors}
+          />
+        </Suspense>
       </section>
       <Posts
         posts={posts}

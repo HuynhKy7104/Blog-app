@@ -2,6 +2,7 @@ import { getSession } from "@/lib/sessions";
 import Link from "next/link";
 import AuthButtons from "../AuthButtons";
 import ProfileDropdown from "./ProfileDropdown";
+import { Suspense } from "react";
 
 type Props = {};
 
@@ -44,7 +45,9 @@ const Navbar = async (props: Props) => {
         ))}
 
         {!session?.user ? (
-          <AuthButtons />
+          <Suspense fallback={null}>
+            <AuthButtons />
+          </Suspense>
         ) : (
           <div className="w-full flex justify-center mt-6 md:w-auto md:block md:mt-0">
             <ProfileDropdown user={session.user} />

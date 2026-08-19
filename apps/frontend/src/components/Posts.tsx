@@ -1,6 +1,7 @@
 import { Post } from "@/lib/types/modelTypes";
 import PostCard from "@/components/postCard";
 import Pagination from "./pagination";
+import { Suspense } from "react";
 
 type Props = {
   posts: Post[];
@@ -29,10 +30,12 @@ const Posts = ({ posts, currentPage, totalPages }: Props) => {
         ))}
       </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-      ></Pagination>
+      <Suspense fallback={null}>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+        ></Pagination>
+      </Suspense>
     </section>
   );
 };

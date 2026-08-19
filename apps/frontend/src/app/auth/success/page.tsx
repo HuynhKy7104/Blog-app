@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { setupGoogleSessionAction } from "@/lib/actions/authActions";
 
-export default function AuthSuccessPage() {
+function AuthSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -26,11 +26,9 @@ export default function AuthSuccessPage() {
           accessToken,
           refreshToken,
         };
-        console.log("AVATAR TRƯỚC KHI LƯU:", sessionPayload.user.avatar);
         await setupGoogleSessionAction(sessionPayload);
 
         const redirectURL = sessionStorage.getItem("oauth_redirect") || "/";
-
         sessionStorage.removeItem("oauth_redirect");
 
         router.push(redirectURL);
@@ -52,5 +50,13 @@ export default function AuthSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function AuthSuccessPage() {
+  return (
+    <Suspense fallback={<div>Đang tải...</div>}>
+      <AuthSuccessContent />
+    </Suspense>
   );
 }

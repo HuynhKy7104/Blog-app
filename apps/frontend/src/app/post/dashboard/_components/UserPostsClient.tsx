@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchUserPosts } from "@/lib/actions/postActions";
 import Pagination from "@/components/pagination";
@@ -154,11 +154,13 @@ export default function UserPostsClient() {
       {/* HIỂN THỊ PHÂN TRANG */}
       {posts.length > 0 && (
         <div className="flex justify-center w-full pb-4">
-          <Pagination
-            totalPages={totalPages}
-            currentPage={page}
-            onPageChange={(newPage) => setPage(newPage)}
-          />
+          <Suspense fallback={null}>
+            <Pagination
+              totalPages={totalPages}
+              currentPage={page}
+              onPageChange={(newPage) => setPage(newPage)}
+            />
+          </Suspense>
         </div>
       )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getPostComments } from "@/lib/actions/commentActions";
@@ -109,11 +109,13 @@ export default function CommentSection({ postId, isLoggedIn, currentUser }: Prop
 
       {/* 3. Tích hợp Pagination đa năng */}
       {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          currentPage={page}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
+        <Suspense fallback={null}>
+          <Pagination
+            totalPages={totalPages}
+            currentPage={page}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        </Suspense>
       )}
     </div>
   );
