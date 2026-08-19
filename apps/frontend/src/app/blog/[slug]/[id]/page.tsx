@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { fetchPostById } from "@/lib/actions/postActions";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 import CommentSection from "./_components/comments";
 import { getSession } from "@/lib/sessions";
 import Likes from "./_components/likes";
@@ -89,7 +89,19 @@ export default async function PostDetailPage({ params }: PostPageProps) {
 
         <div
           className="prose max-w-none text-gray-800 text-lg leading-relaxed space-y-6"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(post.content, {
+              allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+                "img",
+                "h1",
+                "h2",
+              ]),
+              allowedAttributes: {
+                ...sanitizeHtml.defaults.allowedAttributes,
+                img: ["src", "alt", "width", "height"],
+              },
+            }),
+          }}
         />
 
         {post.tags && post.tags.length > 0 && (
