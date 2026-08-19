@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return */
 import { NestFactory } from '@nestjs/core';
-import serverlessExpress from '@codegenie/serverless-express';
 import { AppModule } from '../src/app.module';
+import type { Express } from 'express';
 
-let server: any;
+let expressApp: Express;
 
-async function bootstrap() {
+async function bootstrap(): Promise<Express> {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   await app.init();
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverlessExpress({ app: expressApp });
+  return app.getHttpAdapter().getInstance();
 }
 
 export default async (req: any, res: any) => {
-  server = server ?? (await bootstrap());
-  return server(req, res, () => {});
+  expressApp = expressApp ?? (await bootstrap());
+  return expressApp(req, res);
 };
